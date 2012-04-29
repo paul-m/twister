@@ -13,7 +13,6 @@ require_once 'inc/sanitize.inc';
 // this page exists so you can post 'twists,' which is what
 // I call tweets in the context of this web app.
 
-// break the DB oop model because that's just how it goes. :-)
 // this code is designed to work when I show off my project,
 // not in a production environment.
 
