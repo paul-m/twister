@@ -1,0 +1,35 @@
+I decided to continue my project from the previous class: A Twitter clone called Twister. It's not on the UW servers any more, but lives on at github: https://github.com/paul-m/ita-342/tree/master/project
+
+Currently it allows users to log in and out, and stores 'twists' (instead of 'tweets'). CRUD is possible on the twists.. Users can create, update, and delete twists, and obviously everyone can read them.
+
+I'll add the ability to search for twists and users, rate these twists with an AJAX thumbs-up or -down, impose 140-character limits (in JS and with PHP validation), and a cron/lazy-cron administrative ability to delete twists older than a certain age. If this doesn't keep me busy enough, I can add stuff like consumer APIs of some sort.
+
+Since I'm recycling projects, some of the data already exists in a schema: https://github.com/paul-m/ita-342/blob/master/project/inc/schema.inc. I'll 'brainstorm' this data, and also brainstorm the added features, and make an ER diagram of the whole thing.
+
+Users:
+  ID (key)
+  role (admin, non-admin)
+  first_name
+  last_name
+  user_name
+  password
+  hint
+  created
+  modified
+  email_address
+
+Twists:
+  ID (key)
+  user_id
+  reply_twist_id (can be NULL)
+  created
+  modified
+  twist (text, 140-char limit)
+  points_total
+
+Rating:
+  ID (key)
+  twist_id
+  points (-1, 0, 1)
+  need_update (mark twists:points_total as needing update)
+
