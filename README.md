@@ -1,4 +1,6 @@
-twister
+Twister
 =======
 
-A &#39;twitter&#39; clone. This is my homework for ITA343 at University of Washington.
+A semi-clone of a very popular web site that lets you send short messages.
+
+This is my final project for ITA343 at University of Washington.
