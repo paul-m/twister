@@ -27,7 +27,7 @@ Twists:
   twist (text, 140-char limit)
   points_total
 
-Rating:
+Ratings:
   ID (key)
   twist_id
   points (-1, 0, 1)
