@@ -23,12 +23,12 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `role` varchar(255) NOT NULL default 'user',
   `first_name` varchar(256) default NULL,
   `last_name` varchar(256) default NULL,
-  `user_name` varchar(256) default NULL,
+  `user_name` varchar(256) NOT NULL,
   `password` varchar(40) default NULL,
   `hint` varchar(40) default NULL,
   `created` datetime default NULL,
   `modified` datetime default NULL,
-  `email_address` varchar(256) default NULL,
+  `email_address` varchar(256) NOT NULL,
   PRIMARY KEY  (`USERID`),
   KEY `user_name` (`user_name`)
 );

@@ -105,11 +105,11 @@ if ($request_method == 'GET') {
         echo '<th>Twist</th><th>By</th>';
         // ...and now all the twist rows.
         foreach($twists as $twist) {
-          $user = ArrayCheck::arr_get($users, $twist['survey_id'], -1);
+          $user = ArrayCheck::get($users, $twist['survey_id'], -1);
           echo '<tr>';
           echo '<td><a href="'. Server::php_self('index.php') . '?id=' . $twist['id'] . '">' .
             $twist['question'] . '</a></td><td>' .
-              ArrayCheck::arr_get($user,'user_name','&lt;unknown&gt;') . '</td>';
+              ArrayCheck::get($user,'user_name','&lt;unknown&gt;') . '</td>';
           echo '</tr>';
         }
         echo '</table>';

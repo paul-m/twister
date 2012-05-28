@@ -39,9 +39,9 @@ function get_schema($table) {
   $schema = array(
 
 /** USERS **/
-    'users' => array (
-      '#UNIQUEID' => 'id',
-      'id' => array(
+    'Users' => array (
+      '#UNIQUEID' => 'USERID',
+      'USERID' => array(
         'type' => 'INT',
         'sanitize' => 'INT',
         'form' => array (
@@ -128,9 +128,9 @@ function get_schema($table) {
     ),
 
 /** QUESTIONS **/
-    'questions' => array (
-      '#UNIQUEID' => 'id',
-      'id' => array(
+    'Twists' => array (
+      '#UNIQUEID' => 'TWISTID',
+      'TWISTID' => array(
         'type' => 'INT',
         'sanitize' => 'INT',
         'form' => array (
@@ -138,7 +138,7 @@ function get_schema($table) {
           'display' => 'hidden',
         ),
       ),
-      'survey_id' => array( // SURVEY_ID is doing service as user id.
+      'USERID' => array(
         'type' => 'INT',
         'sanitize' => 'INT',
         'form' => array (
@@ -154,7 +154,7 @@ function get_schema($table) {
           'display' => 'hidden',
         ),
       ),*/
-      'question' => array(
+      'twist' => array(
         'type' => 'VARCHAR',
         'sanitize' => 'VARCHAR',
         'form' => array (

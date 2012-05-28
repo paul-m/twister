@@ -12,21 +12,42 @@ class CRUDOOP {
   protected $schema; // display/validation data.
   protected $table; // name of table.
   protected $idkey; // unique id for this table.
+  
+  // $joins is a list of all schema *names* that are joined
+  // to this table.
+  protected $joins;
 
   function __construct($table = '') {
     $this->set_schema($table);
   }
 
+  function primary_key() {
+    return $this->idkey;
+  }
+  
+  function schema() {
+    return $this->schema;
+  }
+  
+  function table() {
+    return $this->table;
+  }
+  
+  function joined_table() {
+    // return a join for this object.
+    
+  }
+  
+
   function set_schema($table = '') {
     $this->table = NULL;
     $this->schema = NULL;
     $this->idkey = '';
+    $this->clear_joins();
     $this->schema = get_schema($table);
     if ($this->schema) $this->table = $table;
     if (isset($this->schema['#UNIQUEID'])) {
       $this->idkey = $this->schema['#UNIQUEID'];
-    } else {
-      $this->idkey = '';
     }
   }
 
@@ -87,9 +108,9 @@ class CRUDOOP {
    * DATETIME, for a given key within the record.
    */
   function convert_unix_to_datetime_for_key(&$record, $key) {
-    $column = ArrayCheck::arr_get($this->schema, $key, NULL);
+    $column = ArrayCheck::get($this->schema, $key, NULL);
     if (!$column) return;
-    if (ArrayCheck::arr_get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
+    if (ArrayCheck::get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
       // convert the item in the record.
       $timestamp = (int)$record[$key];
       $record[$key] = date("Y-m-d H:i:s", $timestamp);
@@ -101,9 +122,9 @@ class CRUDOOP {
    * timestamp, for a given key within the record.
    */
   function convert_datetime_to_unix_for_key(&$record, $key) {
-    $column = ArrayCheck::arr_get($this->schema, $key, NULL);
+    $column = ArrayCheck::get($this->schema, $key, NULL);
     if (!$column) return;
-    if (ArrayCheck::arr_get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
+    if (ArrayCheck::get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
       // convert the item in the record.
       $datetime = (int)$record[$key];
       $record[$key] = strtotime($datetime);
@@ -116,7 +137,7 @@ class CRUDOOP {
    * SQL queries.
    */
   function sql_value_entick($value, $key) {
-    switch (ArrayCheck::arr_get($this->schema[$key], 'sanitize', 'VARCHAR')) {
+    switch (ArrayCheck::get($this->schema[$key], 'sanitize', 'VARCHAR')) {
 //    switch ($this->schema[$key]['sanitize']) {
       // textual types get ticks
       // PASSWORD is expected to have been hashed.
@@ -132,7 +153,7 @@ class CRUDOOP {
 
   function write_record($record) {
     // if 'id' is given, then it's an update. otherwise, an insert.
-    $affectedid = ArrayCheck::arr_get($record, $this->idkey, -1);
+    $affectedid = ArrayCheck::get($record, $this->idkey, -1);
     $keys = array_intersect_key($record, $this->schema);
     // check if the id key exists. if it's not there, insert.
     if (!array_key_exists($this->idkey, $record)) {
@@ -174,20 +195,47 @@ class CRUDOOP {
     }
   }
   
-/*  function load_all_records() {
-    if ($this->db_connection) {
-      $query = $this->db_connection->query("SELECT * FROM " . $table);
-      $i=0;
-      $result = array();
-      while($i++ < $query->num_rows) {
-        $row = $query->fetch_assoc();
-        $result[$row['id']] = $row;
-      }
-      return $result;
-    }
-    return array();
+  
+  /**
+   * CRUDOOP::join_sql()
+   *
+   * Generates the text of a SQL command joining the 
+   */
+
+  function select($columns = NULL) {}
+  
+  
+  
+  /**
+   * CRUDOOP::join()
+   *
+   * Join other crudoop objects here.
+   * $anotherCrudOOP should contain a primary key that is
+   * also present in our own schema.
+   * This system will do a left join with all the join()ed objects
+   * in the order they were join()ed.
+   */
+  function join($anotherCrudOOP = NULL) {
+    if (!$anotherCrudOOP) return NULL;
+    if (!is_a(CRUDOOP)) return NULL; // this really should raise an exception
+    // do we have their key as a column?
+    $foreign_key = $anotherCrudOOP->primary_key();
+    if (!isset($this->table[$foreign_key])) return NULL;
+    // it seems the object qualifies, so we add it.
+    $this->joins[] = $anotherCrudOOP;
+    return $this;
+  }
+  
+  function clear_joins() {
+    $this->joins = array();
+    $this->join_schema = array();
   }
 
-*/
 }
 
+
+class CRUDOOPException extends Exception {
+}
+
+class CRUDOOPFailedJoinException extends CRUDOOPException {
+}

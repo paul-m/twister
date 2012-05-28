@@ -38,7 +38,7 @@ if ($request_method == 'GET') {
 
 } else if ($request_method == 'POST') {
   // POST means user tried to add a user record.
-  $userSchema = get_schema('users');
+  $userSchema = get_schema('Users');
   $input = Post::for_keys($userSchema);
   
 /*  if (Post::get('password_reenter') != $input['password']) {

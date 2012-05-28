@@ -17,11 +17,11 @@ class CRUDDisplay extends CRUDOOP {
       $schema = $this->schema;
       foreach($schema as $db_col=>$info) {
         if ($db_col != '#UNIQUEID') {
-          $display_info = ArrayCheck::arr_get($info, 'form', NULL);
+          $display_info = ArrayCheck::get($info, 'form', NULL);
           if ($display_info) {
-            $display = ArrayCheck::arr_get($display_info, 'display', '');
+            $display = ArrayCheck::get($display_info, 'display', '');
             if ($display != 'hidden') {
-              $label = ArrayCheck::arr_get($display_info, 'label', $db_col);
+              $label = ArrayCheck::get($display_info, 'label', $db_col);
               $text = $record[$db_col];
               if ($display == 'password')
                 $text = '*****';
@@ -65,17 +65,17 @@ class CRUDDisplay extends CRUDOOP {
     $schema = $this->schema;
     $html = '';
     foreach($schema as $db_col=>$info) {
-      $display_info = ArrayCheck::arr_get($info, 'form', NULL);
+      $display_info = ArrayCheck::get($info, 'form', NULL);
       // we don't want to show #uniqueid.
       // there's probably a better way to structure this.
       if ($display_info && (!($db_col == '#UNIQUEID'))) {
         if ($display_info['type'] != 'hidden') {
           $html .= '<label for="' . $db_col . '">' .
-          ArrayCheck::arr_get($display_info, 'label', $db_col) . "</label>\n";
+          ArrayCheck::get($display_info, 'label', $db_col) . "</label>\n";
         }
         $html .= '<input type="' . $display_info['type'] .
           '" name="' . $db_col . 
-          '" value="' . ArrayCheck::arr_get($record, $db_col, '') . '" /><br>' . "\n";
+          '" value="' . ArrayCheck::get($record, $db_col, '') . '" /><br>' . "\n";
       }
     }
     return $html;
