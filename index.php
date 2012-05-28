@@ -80,14 +80,15 @@ if ($request_method == 'GET') {
       $twistdb = new TwistCRUD;
       $twists = $twistdb->load_all_records(array('created'=>'DESC'));
 
+// echo '<pre>'; print_r($twists); echo '</pre>';
+
       if (count($twists) > 0) {
-        $db = DB::connection();
-        $primary_key = $twistdb->primary_key();
-        // 'survey_id' is our stand-in for user id.
-        $result = $db->query("SELECT DISTINCT survey_id FROM questions");
         $uids = array();
-        while ($uid = $result->fetch_assoc()) $uids[$uid['survey_id']] = $uid['survey_id'];
-        
+        foreach ($twists as $twist) {
+          $uid = $twist['USERID'];
+          $uids[$uid] = $uid;
+        }
+
         // $uids now contains all the users we'll need.
         // let's load all the users.
         
@@ -108,10 +109,10 @@ if ($request_method == 'GET') {
         echo '<th>Twist</th><th>By</th>';
         // ...and now all the twist rows.
         foreach($twists as $twist) {
-          $user = ArrayCheck::get($users, $twist['survey_id'], -1);
+          $user = ArrayCheck::get($users, $twist['TWISTID'], -1);
           echo '<tr>';
-          echo '<td><a href="'. Server::php_self('index.php') . '?id=' . $twist['id'] . '">' .
-            $twist['question'] . '</a></td><td>' .
+          echo '<td><a href="'. Server::php_self('index.php') . '?id=' . $twist['TWISTID'] . '">' .
+            $twist['twist'] . '</a></td><td>' .
               ArrayCheck::get($user,'user_name','&lt;unknown&gt;') . '</td>';
           echo '</tr>';
         }

@@ -18,11 +18,11 @@ class CRUDOOP {
   }
   
   function primary_key() {
-    reutrn $this->$idkey;
+    return $this->idkey;
   }
   
   function name() {
-    return $this->$table;
+    return $this->table;
   }
 
   function set_schema($table = '') {
