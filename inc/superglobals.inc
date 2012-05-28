@@ -20,7 +20,7 @@ class Post extends ArrayCheck {
    * Pass default value you want returned if the variable doesn't exist.
    */
   public static function get($key, $default = NULL) {
-    if (isset($_POST)) return parent::arr_get($_POST, $key, $default);
+    if (isset($_POST)) return parent::get($_POST, $key, $default);
     return $default;
   }
 
@@ -28,7 +28,7 @@ class Post extends ArrayCheck {
    * Set post variables.
    */
   public static function set($key = '', $value = 1) {
-    if (isset($_POST)) return parent::arr_set($_POST, $key, $value);
+    if (isset($_POST)) return parent::set($_POST, $key, $value);
     return FALSE;
   }
   
@@ -52,7 +52,7 @@ class Get extends ArrayCheck {
    * Called 'get_get' because 'get' would just be a constructor.
    */
   public static function get_get($key, $default = NULL) {
-    if (isset($_GET)) return parent::arr_get($_GET, $key, $default);
+    if (isset($_GET)) return parent::get($_GET, $key, $default);
     return $default;
   }
 
@@ -60,7 +60,7 @@ class Get extends ArrayCheck {
    * Set session variables.
    */
   public static function set($key = '', $value = 1) {
-    if (isset($_GET)) return parent::arr_set($_GET, $key, $value);
+    if (isset($_GET)) return parent::set($_GET, $key, $value);
     return FALSE;
   }
   
@@ -107,7 +107,7 @@ class Session extends ArrayCheck {
    */
   public static function get($key, $default = NULL) {
     self::start();
-    if (isset($_SESSION)) return parent::arr_get($_SESSION, $key, $default);
+    if (isset($_SESSION)) return parent::get($_SESSION, $key, $default);
     return $default;
   }
 
@@ -117,7 +117,7 @@ class Session extends ArrayCheck {
   public static function set($key = '', $value = 1) {
     self::start();
     if (isset($_SESSION)) {
-      return parent::arr_set($_SESSION, $key, $value);
+      return parent::set($_SESSION, $key, $value);
     }
     return FALSE;
   }
@@ -154,7 +154,7 @@ class Session extends ArrayCheck {
     if ($currid > 0) {
       $userdb = new UserCRUD;
       $current_user = $userdb->load_user($currid);
-      return ArrayCheck::arr_get($current_user, 'type', 'notadmin') == 'admin';
+      return ArrayCheck::get($current_user, 'type', 'notadmin') == 'admin';
     }
     return FALSE;
   }
@@ -164,9 +164,9 @@ class Session extends ArrayCheck {
     if ($currid > 0) {
       $userdb = new UserCRUD;
       $current_user = $userdb->load_user($currid);
-      $can = ArrayCheck::arr_get($current_user, 'type', 'notadmin') == 'admin';
+      $can = ArrayCheck::get($current_user, 'type', 'notadmin') == 'admin';
       if (!$can)
-        $can = ArrayCheck::arr_get($current_user, 'id', NULL) === 
+        $can = ArrayCheck::get($current_user, 'id', NULL) === 
           Session::current_user(-1);
       return $can;
     }
@@ -212,7 +212,7 @@ class Server extends ArrayCheck {
    * Pass default value you want returned if the variable doesn't exist.
    */
   public static function get($key, $default = NULL) {
-    if (isset($_SERVER)) return parent::arr_get($_SERVER, $key, $default);
+    if (isset($_SERVER)) return parent::get($_SERVER, $key, $default);
     return $default;
   }
 
@@ -220,7 +220,7 @@ class Server extends ArrayCheck {
    * Set session variables.
    */
   public static function set($key = '', $value = 1) {
-    if (isset($_SERVER)) return parent::arr_set($_SERVER, $key, $value);
+    if (isset($_SERVER)) return parent::set($_SERVER, $key, $value);
     return FALSE;
   }
 

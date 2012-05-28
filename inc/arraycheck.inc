@@ -11,7 +11,7 @@ class ArrayCheck {
    * Returns key for array, or $default otherwise.
    * ex: ArrayCheck::get($_POST, 'id', array('id' => -1));
    */
-  public static function arr_get($array, $key, $default = NULL) {
+  public static function get($array, $key, $default = NULL) {
     if ($array && isset($array[$key])) {
       return $array[$key];
     }
@@ -32,7 +32,7 @@ class ArrayCheck {
   }
 
   public static function set_if_not_set(&$array, $key = '', $value = 1) {
-    if (!self::arr_get($array, $key, NULL)) {
+    if (!self::get($array, $key, NULL)) {
       $array[$key] = $value;
       return $value;
     }

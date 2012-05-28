@@ -16,6 +16,14 @@ class CRUDOOP {
   function __construct($table = '') {
     $this->set_schema($table);
   }
+  
+  function primary_key() {
+    reutrn $this->$idkey;
+  }
+  
+  function name() {
+    return $this->$table;
+  }
 
   function set_schema($table = '') {
     $this->table = NULL;
@@ -87,9 +95,9 @@ class CRUDOOP {
    * DATETIME, for a given key within the record.
    */
   function convert_unix_to_datetime_for_key(&$record, $key) {
-    $column = ArrayCheck::arr_get($this->schema, $key, NULL);
+    $column = ArrayCheck::get($this->schema, $key, NULL);
     if (!$column) return;
-    if (ArrayCheck::arr_get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
+    if (ArrayCheck::get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
       // convert the item in the record.
       $timestamp = (int)$record[$key];
       $record[$key] = date("Y-m-d H:i:s", $timestamp);
@@ -101,9 +109,9 @@ class CRUDOOP {
    * timestamp, for a given key within the record.
    */
   function convert_datetime_to_unix_for_key(&$record, $key) {
-    $column = ArrayCheck::arr_get($this->schema, $key, NULL);
+    $column = ArrayCheck::get($this->schema, $key, NULL);
     if (!$column) return;
-    if (ArrayCheck::arr_get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
+    if (ArrayCheck::get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
       // convert the item in the record.
       $datetime = (int)$record[$key];
       $record[$key] = strtotime($datetime);
@@ -116,7 +124,7 @@ class CRUDOOP {
    * SQL queries.
    */
   function sql_value_entick($value, $key) {
-    switch (ArrayCheck::arr_get($this->schema[$key], 'sanitize', 'VARCHAR')) {
+    switch (ArrayCheck::get($this->schema[$key], 'sanitize', 'VARCHAR')) {
 //    switch ($this->schema[$key]['sanitize']) {
       // textual types get ticks
       // PASSWORD is expected to have been hashed.
@@ -132,7 +140,7 @@ class CRUDOOP {
 
   function write_record($record) {
     // if 'id' is given, then it's an update. otherwise, an insert.
-    $affectedid = ArrayCheck::arr_get($record, $this->idkey, -1);
+    $affectedid = ArrayCheck::get($record, $this->idkey, -1);
     $keys = array_intersect_key($record, $this->schema);
     // check if the id key exists. if it's not there, insert.
     if (!array_key_exists($this->idkey, $record)) {
@@ -189,5 +197,25 @@ class CRUDOOP {
   }
 
 */
+
+
+  function search($query, $columns = array(), $limit = 20) {
+    // $query is the literal SQL string that goes after WHERE
+    // eg %searchterm%
+    // $columns is the set of columns to find within.
+    // "SELECT DISTINCT key FROM table WHERE column like '%term%'"
+    $primary_key = $this->primary_key();
+    $table = $this->table();
+    $sql = "SELECT DISTINCT $primary_key FROM $table WHERE ";
+    $like = array();
+    foreach ($columns as $column) {
+      $like[] = $column . ' LIKE ' . $query;
+    }
+    $sql .= implode(' OR ', $like) . " LIMIT $limit";
+    $result = DB::connection()->query($sql);
+    if (!$result) echo "Failed to find stuff.";
+    $hits = $result->fetch_all();
+  }
+
 }
 

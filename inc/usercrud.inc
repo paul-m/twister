@@ -16,14 +16,14 @@ class UserCRUD extends CRUDDisplay {
    */
   function __construct() {
     // UserCRUD only ever deals with the 'users' table.
-    parent::__construct('users');
+    parent::__construct('Users');
   }
 
   /**
    * Some 'users' use-cases for write_record().
    */
   function write_user($record = array()) {
-    $isinsert = (ArrayCheck::arr_get($record, 'id', -1) < 1);
+    $isinsert = (ArrayCheck::get($record, 'USERID', -1) < 1);
     // unset the password to update a record without changing it.
     if ($isinsert) {
       $record['created'] = time();
@@ -46,7 +46,7 @@ class UserCRUD extends CRUDDisplay {
   }
 
   function load_user($id = -1) {
-    if ($id < 0) return array('id' => $id);
+    if ($id < 0) return array('USERID' => $id);
     $record = parent::load_record($id);
     if ($record) {
       $this->convert_datetime_to_unix_for_key($record, 'modified');

@@ -59,16 +59,28 @@ register_shutdown_function('db_shutdown');
  * @access public
  * @return Array with database credentials.
  */
-function get_db() {
+/*function get_db() {
   return array(
     'database'=> 'paulm77',
     'user' => 'paulm77',
-    'password' => 'paulm77',
+    'password' => '',
     'host' => "ovid.u.washington.edu",
     'port' => "2900",
     'table_prefix' => '',
   );
 }
+*/
+
+function get_db() {
+  return array(
+    'database'=> 'TwisterDB',
+    'user' => 'root',
+    'password' => 'root',
+    'host' => "localhost",
+    'port' => "8889",
+  );
+}
+
 
 /*
 CREATE TABLE IF NOT EXISTS `users` (

@@ -17,16 +17,16 @@ class TwistCRUD extends CRUDDisplay {
    */
   function __construct() {
     // TwistCRUD only ever deals with the 'questions' table.
-    parent::__construct('questions');
+    parent::__construct('Twists');
   }
 
   function write_twist($record = array()) {
     // check for insert condition... id doesn't exist or is -1
-    if (ArrayCheck::arr_get($record, 'id', -1) < 1) {
+    if (ArrayCheck::get($record, 'TWISTID', -1) < 1) {
       $record['created'] = time();
       unset($record['id']);
     }
-    ArrayCheck::set_if_not_set($record, 'survey_id', -1);
+    ArrayCheck::set_if_not_set($record, 'USERID', -1);
     $record['modified'] = time();
     $this->convert_unix_to_datetime_for_key($record, 'modified');
     $this->convert_unix_to_datetime_for_key($record, 'created');
@@ -55,11 +55,11 @@ class TwistCRUD extends CRUDDisplay {
       $record = $this->load_twist($id);
       if ($record) {
         $userdb = new UserCRUD;
-        $user = $userdb->load_user($record['survey_id']);
+        $user = $userdb->load_user($record['USERID']);
         
         $html = '<div id="twist">' . $record['question'] . '</div>';
         $html .= '<div>Written by: ' .
-          ArrayCheck::arr_get($user,'user_name','&lt;unknown&gt;') .
+          ArrayCheck::get($user,'user_name','&lt;unknown&gt;') .
           ' on ' . date(DATE_RFC850, $record['created']);
         
         $current_user = Session::current_user();
@@ -90,10 +90,10 @@ class TwistCRUD extends CRUDDisplay {
     }
     $html = '<label for="question">Twist:</label>';
     $html .= '<input type="text" name="question" value="' .
-      ArrayCheck::arr_get($record, 'question', '') . '" /><br>'."\n";
+      ArrayCheck::get($record, 'question', '') . '" /><br>'."\n";
     $html .= '<input type="hidden" name="id" value="' .
-      ArrayCheck::arr_get($record, 'id', -1) . '" /><br>'."\n";
-    $html .= '<input type="hidden" name="survey_id" value="' .
+      ArrayCheck::get($record, 'id', -1) . '" /><br>'."\n";
+    $html .= '<input type="hidden" name="USERID" value="' .
       Session::current_user() . '" /><br>'."\n";
     return $html;
   }
