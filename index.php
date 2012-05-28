@@ -22,6 +22,9 @@ if ($request_method == 'GET') {
   // viewing twist
   // adding twist type=add
   // editing twist type=edit
+  // xml output type=xml
+  // searching type=search
+  //
   $twistdb = new TwistCRUD;
   $type = Get::get_get('type', '');
   $twistid = Get::get_get('id', '-1');
@@ -79,7 +82,7 @@ if ($request_method == 'GET') {
 
       if (count($twists) > 0) {
         $db = DB::connection();
-        
+        $primary_key = $twistdb->primary_key();
         // 'survey_id' is our stand-in for user id.
         $result = $db->query("SELECT DISTINCT survey_id FROM questions");
         $uids = array();

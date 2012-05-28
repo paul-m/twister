@@ -127,7 +127,7 @@ function get_schema($table) {
       ),
     ),
 
-/** QUESTIONS **/
+/** TWISTS **/
     'Twists' => array (
       '#UNIQUEID' => 'TWISTID',
       'TWISTID' => array(

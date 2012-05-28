@@ -63,7 +63,7 @@ register_shutdown_function('db_shutdown');
   return array(
     'database'=> 'paulm77',
     'user' => 'paulm77',
-    'password' => 'paulm77',
+    'password' => '',
     'host' => "ovid.u.washington.edu",
     'port' => "2900",
     'table_prefix' => '',

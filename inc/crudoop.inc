@@ -32,12 +32,6 @@ class CRUDOOP {
   function table() {
     return $this->table;
   }
-  
-  function joined_table() {
-    // return a join for this object.
-    
-  }
-  
 
   function set_schema($table = '') {
     $this->table = NULL;
@@ -231,6 +225,23 @@ class CRUDOOP {
     $this->join_schema = array();
   }
 
+  function search($query, $columns = array(), $limit = 20) {
+    // $query is the literal SQL string that goes after WHERE
+    // eg %searchterm%
+    // $columns is the set of columns to find within.
+    // "SELECT DISTINCT key FROM table WHERE column like '%term%'"
+    $primary_key = $this->primary_key();
+    $table = $this->table();
+    $sql = "SELECT DISTINCT $primary_key FROM $table WHERE ";
+    $like = array();
+    foreach ($columns as $column) {
+      $like[] = $column . ' LIKE ' . $query;
+    }
+    $sql .= implode(' OR ', $like) . " LIMIT $limit";
+    $result = DB::connection()->query($sql);
+    if (!$result) echo "Failed to find stuff.";
+    $hits = $result->fetch_all();
+  }
 }
 
 
