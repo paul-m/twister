@@ -9,9 +9,6 @@ require_once 'inc/usercrud.inc';
 require_once 'inc/superglobals.inc';
 require_once 'inc/sanitize.inc';
 
-// this page exists so you can post 'twists,' which is what
-// I call tweets in the context of this web app.
-
 // break the DB oop model because that's just how it goes. :-)
 // this code is designed to work when I show off my project,
 // not in a production environment.
@@ -28,7 +25,8 @@ if ($request_method == 'GET') {
   $userid = Get::get_get('id', '-1');
   if ($action == 'edit') {
     echo '<h2>Edit this user</h2>';
-    echo '<form name="input" action="' . Server::php_self('index.php') . '" method="post">';
+    echo '<form name="input" action="' . Server::php_self('index.php') .
+      '" method="post">';
     echo '<input type="hidden" id="input" name="action" value="edit" />';
     echo $userdb->html_form($userid);
     echo '<input type="submit" value="Submit" />';
@@ -68,35 +66,10 @@ if ($request_method == 'GET') {
           '?action=delete&id=' . $userid . '">delete</a></div>';
       }
     } else {
-      // no valid twist ID so show the big list of twists.
+      // no user ID so show the big list of users.
       $userdb = new UserCRUD;
-      $twists = $userdb->load_all_records(array('created'=>'DESC'));
-
-      if (count($twists) > 0) {
-        $userdb = new UserCRUD;
-        $users = $userdb->load_all_records();
-        
-        // gather admin and current info
-        $admin = Session::current_user_is_admin();
-        $current_user = $userdb->load_user(Session::current_user());
-
-        echo '<h2>The Big List Of Users</h2>';
-        echo '<table border="1"><tr>';
-        // header row
-        echo '<th>User</th>';
-        // ...and now all the twist rows.
-        foreach($users as $user) {
-          echo '<tr>';
-          echo '<td><a href="'. Server::php_self('user.php') . '?id=' . $user['id'] . '">' .
-            $user['user_name'] . '</a></td>';
-          echo '</tr>';
-        }
-        echo '</table>';
-      } else {
-        // no twists to display.
-        echo "<h2>Sorry, there aren't any users to lists.</h2>";
-        echo '<div>Why not <a href="register.php">register</a>?</div>';
-      }
+      $table = $userdb->table_name();
+      $userdb->list_users($userdb->crud_query("SELECT * FROM $table"), TRUE, TRUE);
     }
   }
 //// end of GET
@@ -111,12 +84,10 @@ if ($request_method == 'GET') {
       echo '<h2>Deleted.</h2><div>Why not look at <a href="' . Server::php_self('user.php') . '">the big list of users</a>?</div>';
       break;
     case 'edit':
-//    echo 'edit post...';
-      $userSchema = get_schema('users');
-      $input = Post::for_keys($userSchema);
-    //  echo '<pre>'; var_dump($input); echo '</pre>';
-      $input = sanitize_input_schema($input, $userSchema);
       $userdb = new UserCRUD();
+      $userSchema = get_schema($userdb->table_name());
+      $input = Post::for_keys($userSchema);
+      $input = sanitize_input_schema($input, $userSchema);
       $changed = $userdb->write_user($input);
       echo 'Edited user.';
       echo $userdb->html_display($changed);

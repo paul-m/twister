@@ -49,7 +49,7 @@ function get_schema($table) {
           'display' => 'hidden',
         ),
       ),
-      'type' => array(
+      'role' => array(
         'type' => 'VARCHAR',
         'sanitize' => 'VARCHAR',
         'form' => array (
@@ -95,7 +95,6 @@ function get_schema($table) {
         'sanitize' => 'VARCHAR',
         'form' => array (
           'type' => 'text',
-          'display' => 'hidden',
           'label' => 'Hint',
         ),
       ),
@@ -112,7 +111,6 @@ function get_schema($table) {
         'sanitize' => 'DATETIME',
         'form' => array (
           'type'=>'text',
-          'display' => 'hidden',
           'label'=>'Modified',
         ),
       ),
@@ -121,7 +119,6 @@ function get_schema($table) {
         'sanitize' => 'EMAIL',
         'form' => array (
           'type' => 'text',
-          'display' => 'hidden',
           'label' => 'Email',
         ),
       ),

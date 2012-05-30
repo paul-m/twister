@@ -23,8 +23,8 @@ class UserCRUD extends CRUDDisplay {
    * Some 'users' use-cases for write_record().
    */
   function write_user($record = array()) {
-    $isinsert = (ArrayCheck::get($record, 'USERID', -1) < 1);
-    // unset the password to update a record without changing it.
+    $primary_key = $this->primary_key();
+    $isinsert = (ArrayCheck::get($record, $primary_key, -1) < 1);
     if ($isinsert) {
       $record['created'] = time();
       if (isset($record['password'])) {
@@ -67,6 +67,73 @@ class UserCRUD extends CRUDDisplay {
       parent::delete_record($id, $this->table, $this->idkey);
     }
     // TODO: return a success/fail value.
+  }
+
+  /**
+   * $result is a mysqli result object
+   */
+  function list_users($result = NULL, $allow_view = TRUE, $allow_edit = FALSE) {
+    if ($result) {
+      // set up the column display names
+      $columns = $this->table_column_display_info();
+  
+      // start showing data
+      $showme = $result->fetch_assoc();
+      if ($showme) {
+        // if the query doesn't give us the primary key then
+        // we have no way of knowing which record we'd be editing.
+        $has_primary_key = ArrayCheck::get($showme, $this->primary_key(), FALSE);
+        $table_name = $this->table_name();
+        echo "<h2>$table_name</h2>\n";
+        // start table
+        echo '<table cellpadding="3" cellspacing="0" border="1">';
+        // show DB column names as table headers
+        echo "<tr>\n";
+        foreach ($columns as $column=>$display) {
+          echo "<th>$display</th>";
+        }
+        if (($allow_edit || $allow_view) && $has_primary_key) echo '<th></th>';
+        echo "</tr>\n";
+        // now start showing row data
+        $rownum = 0;
+        do {
+          if (++$rownum & 1) echo '<tr class="odd">';
+          else echo '<tr class="even">';
+          foreach ($columns as $column=>$display) {
+            $data = $showme[$column];
+            if ($data == 'NULL') $data = 'N/A';
+            echo "<td>$data</td>\n";
+          }
+          if ($has_primary_key && ($allow_edit || $allow_view)) {
+            $operations = '<div>';
+            if ($allow_view)
+              $operations .= $this->view_link($showme[$this->primary_key()], 'view');
+            if ($allow_edit)
+              $operations .= ' ' . $this->edit_link($showme[$this->primary_key()], 'edit');
+            echo "<td>$operations</td>";
+          }
+          echo '</tr>';
+        } while ($showme = $result->fetch_assoc());
+      }
+      return;
+    }
+    echo '<div style="error">No results for this query.</div>';
+  }
+
+  /**
+   * Returns the text of a link to edit a given user, by id.
+   */
+  function edit_link($id, $text) {
+    return '<div><a href="' . Server::php_self('user.php') .
+      '?action=edit&id=' . $id . '">' . $text . '</a></div>';
+  }
+
+  /**
+   * Returns the text of a link to view a user, by id.
+   */
+  function view_link($id, $text) {
+    return '<div><a href="' . Server::php_self('user.php') .
+      '?id=' . $id . '">' . $text . '</a></div>';
   }
 
 }

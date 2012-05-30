@@ -21,7 +21,7 @@ class CRUDOOP {
     return $this->idkey;
   }
   
-  function name() {
+  function table_name() {
     return $this->table;
   }
 
@@ -38,7 +38,13 @@ class CRUDOOP {
     }
   }
 
-  function load_record($id) {
+  function crud_query($sql = '') {
+    if ($sql == '') return NULL;
+    $result = DB::connection()->query($sql);
+    return $result;
+  }
+
+  function load_record($id = -1) {
     if ($this->schema) {
       $db_connection = DB::connection();
       if ($db_connection) {
@@ -167,7 +173,9 @@ class CRUDOOP {
         implode(", ", $set) .
         " WHERE " . $this->idkey . " = " . $record[$this->idkey];
     }
-    $query = DB::connection()->query($queryString);
+//echo '<pre>'; print_r($record); echo '</pre>';
+//echo $queryString;
+    $query = $this->crud_query($queryString);
     if ($affectedid == -1) $affectedid = DB::connection()->insert_id;
     return $affectedid;
     // TODO: exception for a bad outcome.

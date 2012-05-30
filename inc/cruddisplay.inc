@@ -8,8 +8,6 @@ class CRUDDisplay extends CRUDOOP {
   // return HTML as a nice display of the data.
   // we'll just make a table for now. easy to process.
   function html_display($id = -1) {
-//    if ($id < 0) return "<div><h3>Unable to load non-existent record.</h3></div>";
-//echo "loading: $id";
     $record = $this->load_record($id);
 
     if ($record) {
@@ -157,6 +155,68 @@ class CRUDDisplay extends CRUDOOP {
     return $html;
   }
 */
+
+
+  /**
+   * $result is a mysqli result object
+   */
+  function html_generic_table($result = NULL) {
+    if ($result) {
+      // set up the column display names
+      $columns = $this->table_column_display_info();
+  
+      // start showing data
+      $showme = $result->fetch_assoc();
+      if ($showme) {
+        echo "<h2>$this->name()</h2>\n";
+        // start table
+        echo '<table cellpadding="3" cellspacing="0" border="1">';
+        // show DB column names as table headers
+        echo "<tr>\n";
+        foreach ($columns as $column=>$display) {
+          echo "<th>$display</th>";
+        }
+        echo "</tr>\n";
+        // now start showing row data
+        $rownum = 0;
+        do {
+          if (++$rownum & 1) echo '<tr class="odd">';
+          else echo '<tr class="even">';
+          foreach ($columns as $column=>$display) {
+            $data = $showme[$column];
+            if ($data == 'NULL') $data = 'N/A';
+            echo "<td>$data</td>\n";
+          }
+          echo '</tr>';
+        } while ($showme = $result->fetch_assoc());
+      }
+      return;
+    }
+    echo '<div style="error">No results for this query.</div>';
+  }
+  
+  /**
+   * Hands us an array with the display info for
+   * all the columns. Useful for building tables.
+   */
+  function table_column_display_info() {
+    // set up the column display names
+    $columns = array();
+    $schema = $this->schema;
+    foreach($schema as $db_col=>$info) {
+      if ($db_col != '#UNIQUEID') {
+        $display_info = ArrayCheck::get($info, 'form', NULL);
+        if ($display_info) {
+          $display = ArrayCheck::get($display_info, 'display', '');
+          if ($display != 'hidden') {
+            $label = ArrayCheck::get($display_info, 'label', $db_col);
+            $columns[$db_col] = $label;
+          }
+        }
+      }
+    }
+    return $columns;
+  }
 }
 
 
