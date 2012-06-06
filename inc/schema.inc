@@ -143,14 +143,15 @@ function get_schema($table) {
           'display' => 'hidden',
         ),
       ),
-/*      'sequence' => array(
+      'reply_to_USERID' => array(
         'type' => 'INT',
         'sanitize' => 'INT',
         'form' => array (
           'type' => 'hidden',
           'display' => 'hidden',
         ),
-      ),*/
+      ),
+
       'twist' => array(
         'type' => 'VARCHAR',
         'sanitize' => 'VARCHAR',
@@ -184,6 +185,17 @@ function get_schema($table) {
           'label'=>'Modified',
         ),
       ),
+
+      'points_total' => array(
+        'type' => 'INT',
+        'sanitize' => 'INT',
+        'form' => array (
+          'type' => 'int',
+          'display' => 'hidden',
+          'label'=> 'Points',
+        ),
+      ),
+
     ),
 
 /** RATINGS **/

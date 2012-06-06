@@ -159,7 +159,7 @@ class CRUDDisplay extends CRUDOOP {
   /**
    * $result is a mysqli result object
    */
-  function html_generic_table($result = NULL, $allow_view = FALSE, $allow_edit = FALSE) {
+  function html_generic_table($result = NULL, $allow_view = FALSE, $allow_edit = FALSE, $allow_delete = TRUE) {
     if ($result) {
       // set up the column display names
       $columns = $this->table_column_display_info();
@@ -194,6 +194,8 @@ class CRUDDisplay extends CRUDOOP {
               $operations .= $this->view_link($showme[$this->primary_key()], 'view');
             if ($allow_edit)
               $operations .= ' ' . $this->edit_link($showme[$this->primary_key()], 'edit');
+            if ($allow_delete)
+              $operations .= ' ' . $this->delete_link($showme[$this->primary_key()], 'delete');
             echo "<td>$operations</td>";
           }
           echo '</tr>';
@@ -209,7 +211,7 @@ class CRUDDisplay extends CRUDOOP {
    * this function differes from html_generic_table by showing the raw
    * column names.
    */
-  function html_result_table($result = NULL, $allow_view = FALSE, $allow_edit = FALSE) {
+  function html_result_table($result = NULL, $allow_view = FALSE, $allow_edit = FALSE, $allow_delete = FALSE) {
     if ($result) {
       // start showing data
       $showme = $result->fetch_assoc();
@@ -243,6 +245,8 @@ class CRUDDisplay extends CRUDOOP {
               $operations .= $this->view_link($showme[$this->primary_key()], 'view');
             if ($allow_edit)
               $operations .= ' ' . $this->edit_link($showme[$this->primary_key()], 'edit');
+            if ($allow_delete)
+              $operations .= $this->delete_link($showme[$this->primary_key()], 'view');
             echo "<td>$operations</td>";
           }
           echo '</tr>';
@@ -282,7 +286,8 @@ class CRUDDisplay extends CRUDOOP {
    * Returns the text of a link to edit a given user, by id.
    */
   function edit_link($id, $text) {
-    return '<div><a href="' . Server::php_self('user.php') .
+//    if ($id < 1) return '<div class="disabled">' . $text . '</div>';
+    return '<div><a href="' . Server::php_self('index.php') .
       '?action=edit&id=' . $id . '">' . $text . '</a></div>';
   }
 
@@ -290,8 +295,22 @@ class CRUDDisplay extends CRUDOOP {
    * Returns the text of a link to view a user, by id.
    */
   function view_link($id, $text) {
-    return '<div><a href="' . Server::php_self('user.php') .
+//    if ($id < 1) return '<div class="disabled">' . $text . '</div>';
+    return '<div><a href="' . Server::php_self('index.php') .
       '?action=view&id=' . $id . '">' . $text . '</a></div>';
+  }
+  
+  function delete_link($id, $text) {
+//    if ($id < 1) return '<div class="disabled">' . $text . '</div>';
+    return '<div><a href="' . Server::php_self('index.php') .
+      '?action=delete&id=' . $id . '">' . $text . '</a></div>';
+  }
+
+  function table_show_all($allow_view = FALSE, $allow_edit = TRUE) {
+    $table = $this->table_name();
+    $sql = "SELECT * FROM $table";
+    $results = $this->crud_query($sql);
+    $this->html_generic_table($results, $allow_view, $allow_edit);
   }
 
 }

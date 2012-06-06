@@ -38,7 +38,7 @@ if ($request_method == 'GET') {
     if (TRUE) {//Session::current_user_can_edit()) {
       echo '<h2>Edit this twist</h2>';
       echo '<form name="input" action="' . Server::php_self('index.php') . '" method="post">';
-      echo '<input type="hidden" id="twist_edit" name="type" value="edit" />';
+      echo '<input type="hidden" id="twist_edit" name="action" value="edit" />';
       echo $twistdb->html_form($twistid);
       echo '<input type="submit" value="Submit" />';
     } else {
@@ -46,11 +46,11 @@ if ($request_method == 'GET') {
     }
   }
   else if ($action == 'add') {
-    $current_user = Session::current_user();
-    if ($current_user > 0) {
+    //$current_user = Session::current_user();
+    if (TRUE) { //$current_user > 0) {
       echo '<h2>Add a twist</h2>'."\n";
       echo '<form name="twist_add" action="' . Server::php_self('index.php') . '" method="post">'."\n";
-      echo '<input type="hidden" name="type" value="add" />'."\n";
+      echo '<input type="hidden" name="action" value="add" />'."\n";
       echo $twistdb->html_form($twistid);
       echo '<input type="submit" value="Submit" />';
     } else {
@@ -59,13 +59,13 @@ if ($request_method == 'GET') {
     }
   }
   else if ($action == 'delete') {
-    if (Session::current_user_can_edit()) {
+    if (TRUE) { //Session::current_user_can_edit()) {
       echo '<h2>Are you sure you want to delete this twist?</h2>';
-      echo $twistdb->html_display($twistid);
       echo '<form name="input" action="' . Server::php_self('index.php') . '" method="post">';
-      echo '<input type="hidden" id="twist_edit" name="type" value="delete" />';
+      echo '<input type="hidden" id="twist_edit" name="action" value="delete" />';
       echo '<input type="hidden" id="twist_edit" name="id" value="' . $twistid . '" />';
       echo '<input type="submit" value="Delete" />';
+      echo $twistdb->html_display($twistid);
     } else {
       echo "<h2>Sorry. You can't delete anything.</h2>";
     }
@@ -82,23 +82,22 @@ if ($request_method == 'GET') {
   } else {
     // by default we show all the twists.
     $twistdb = new TwistCRUD;
-    $table = $twistdb->table_name();
-    $sql = "SELECT * FROM $table";
-    $results = $twistdb->crud_query($sql);
-    $twistdb->html_generic_table($results, TRUE, TRUE);
+    $twistdb->table_show_all(TRUE, TRUE);
   }
 //// end of GET
 } else if ($request_method == 'POST') {
   // POST means to add or update this twist record.
-  $action = Post::get('type', '');
+  $action = Post::get('action', '');
   $twisid = Post::get('id', '-1');
   $twistdb = new TwistCRUD;
   switch ($action) {
     case 'delete':
       // delete item
-      if (Session::current_user_can_edit()) {
-        $twistdb->delete_record(sanitize_INT($_POST['id']));
-        echo '<h2>Deleted.</h2><div>Why not look at <a href="' . Server::php_self('index.php') . '">the big list of twists</a>?</div>';
+      if (TRUE) { //Session::current_user_can_edit()) {
+        $twistdb->delete_record(sanitize_INT($twisid));
+        echo '<h2>Deleted.</h2>';
+        $twistdb = new TwistCRUD;
+        $twistdb->table_show_all(TRUE, TRUE);
       } else {
         echo "<h2>Sorry. You can't delete anything.</h2>";
       }
@@ -109,16 +108,19 @@ if ($request_method == 'GET') {
         $twistdb = new TwistCRUD();
         $userSchema = get_schema($twistdb->table_name());
         $input = Post::for_keys($userSchema);
-        $input[$twistdb->primary_key()] = $twistid;
-        echo '<pre>'; var_dump($input); echo '</pre>';
         $input = sanitize_input_schema($input, $userSchema);
+        echo '<pre>'; var_dump($input); echo '</pre>';
         //$input['created'] = time();
         $added = $twistdb->write_twist($input);
-        echo 'Added twist.';
+        echo 'Updated twist.';
         echo $twistdb->html_display($added);
       } else {
         echo "<h2>Sorry. You can't edit anything.</h2>";
       }
+      break;
+    default:
+      $twistdb = new TwistCRUD;
+      $twistdb->table_show_all(TRUE, TRUE);
   }
 }
 

@@ -8,12 +8,12 @@
 <nav id="centeredmenu">
    <ul>
       <li><a href="index.php">Twists</a></li>
-      <li><a href="index.php?type=add">Add a Twist</a></li>
+      <li><a href="index.php?action=add">Add a Twist</a></li>
       <li><a href="user.php">Users</a></li>
       <li><a href="register.php">Register</a></li>
       <li><a href="login.php">Login</a></li>
-      <li><a href="login.php?type=logout">Logout</a></li>
-      <li><a href="index.php?type=xml">XML</a></li>
+      <li><a href="login.php?action=logout">Logout</a></li>
+      <li><a href="index.php?action=xml">XML</a></li>
    </ul>
 </nav>
 <div id="wrapper">

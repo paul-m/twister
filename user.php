@@ -68,10 +68,7 @@ if ($request_method == 'GET') {
     } else {
       // no user ID so show the big list of users.
       $userdb = new UserCRUD;
-      $table = $userdb->table_name();
-      $sql = "SELECT * FROM $table";
-      $results = $userdb->crud_query($sql);
-      $userdb->html_generic_table($results, TRUE, TRUE);
+      $userdb->table_show_all(TRUE, TRUE);
     }
   }
 //// end of GET

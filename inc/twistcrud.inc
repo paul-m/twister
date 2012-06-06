@@ -27,7 +27,11 @@ class TwistCRUD extends CRUDDisplay {
       unset($record['id']);
     }
     ArrayCheck::set_if_not_set($record, 'USERID', -1);
-    $record['modified'] = time();
+    $time = time();
+    if (!isset($record['created']) ||
+      $record['created'] == '')
+        $record['created'] = $time;
+    $record['modified'] = $time;
     $this->convert_unix_to_datetime_for_key($record, 'modified');
     $this->convert_unix_to_datetime_for_key($record, 'created');
     return parent::write_record($record);
@@ -52,7 +56,7 @@ class TwistCRUD extends CRUDDisplay {
   // return HTML as a nice display of the data.
   function html_display($id = -1) {
     if ($id > 0) {
-      $sql = "select t.*, u.`user_name` from Twists as t left join Users as u on t.`USERID` = u.`USERID` where t.TWISTID = $id";
+      $sql = "select t.`TWISTID`, t.`twist`, t.`modified`, u.`user_name` from Twists as t left join Users as u on t.`USERID` = u.`USERID` where t.TWISTID = $id";
       $result = $this->crud_query($sql);
       $this->html_result_table($result, FALSE, TRUE);
       return;
@@ -62,7 +66,7 @@ class TwistCRUD extends CRUDDisplay {
 
   // return HTML as a form for entering the data.
   // caller must supply their own <form> tag and submit button.
-  function html_form($id = -1) {
+/*  function html_form($id = -1) {
     if ($id > 0) {
       $record = $this->load_twist($id);
     } else {
@@ -76,6 +80,6 @@ class TwistCRUD extends CRUDDisplay {
     $html .= '<input type="hidden" name="USERID" value="' .
       Session::current_user() . '" /><br>'."\n";
     return $html;
-  }
+  }*/
 
 }
