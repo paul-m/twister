@@ -171,6 +171,7 @@ function get_schema($table) {
         'sanitize' => 'DATETIME',
         'form' => array (
           'type'=>'hidden',
+          'display' => 'hidden',
           'label'=>'Created',
         ),
       ),
@@ -181,6 +182,43 @@ function get_schema($table) {
           'type'=>'hidden',
 //          'display' => 'hidden',
           'label'=>'Modified',
+        ),
+      ),
+    ),
+
+/** RATINGS **/
+    'Ratings' => array (
+      '#UNIQUEID' => 'RATINGID',
+      'RATINGID' => array(
+        'type' => 'INT',
+        'sanitize' => 'INT',
+        'form' => array (
+          'type' => 'hidden',
+          'display' => 'hidden',
+        ),
+      ),
+      'TWISTID' => array(
+        'type' => 'INT',
+        'sanitize' => 'INT',
+        'form' => array (
+          'type' => 'hidden',
+          'display' => 'hidden',
+        ),
+      ),
+      'USERID' => array(
+        'type' => 'INT',
+        'sanitize' => 'INT',
+        'form' => array (
+          'type' => 'hidden',
+          'display' => 'hidden',
+        ),
+      ),
+      'points' => array(
+        'type' => 'INT',
+        'sanitize' => 'INT',
+        'form' => array (
+          'type' => 'hidden',
+          'display' => 'hidden',
         ),
       ),
     ),

@@ -16,6 +16,12 @@ require_once 'inc/sanitize.inc';
 // this code is designed to work when I show off my project,
 // not in a production environment.
 
+/*$crud = new TwistCRUD;
+$crud->join(new CRUDOOP('Ratings'));
+$crud->join(new UserCRUD);
+
+echo '<p class="header_title">' . $crud->join_sql() . '</p>';*/
+
 $request_method = Server::request_method();
 if ($request_method == 'GET') {
   // GET means:
@@ -26,10 +32,10 @@ if ($request_method == 'GET') {
   // searching type=search
   //
   $twistdb = new TwistCRUD;
-  $type = Get::get_get('type', '');
+  $action = Get::get_get('action', '');
   $twistid = Get::get_get('id', '-1');
-  if ($type == 'edit') {
-    if (Session::current_user_can_edit()) {
+  if ($action == 'edit') {
+    if (TRUE) {//Session::current_user_can_edit()) {
       echo '<h2>Edit this twist</h2>';
       echo '<form name="input" action="' . Server::php_self('index.php') . '" method="post">';
       echo '<input type="hidden" id="twist_edit" name="type" value="edit" />';
@@ -39,7 +45,7 @@ if ($request_method == 'GET') {
       echo "<h2>Sorry. You can't edit anything.</h2>";
     }
   }
-  else if ($type == 'add') {
+  else if ($action == 'add') {
     $current_user = Session::current_user();
     if ($current_user > 0) {
       echo '<h2>Add a twist</h2>'."\n";
@@ -52,7 +58,7 @@ if ($request_method == 'GET') {
       echo '<div>Why not <a href="register.php">register</a> or <a href="login.php">log in</a>?</div>';
     }
   }
-  else if ($type == 'delete') {
+  else if ($action == 'delete') {
     if (Session::current_user_can_edit()) {
       echo '<h2>Are you sure you want to delete this twist?</h2>';
       echo $twistdb->html_display($twistid);
@@ -64,72 +70,30 @@ if ($request_method == 'GET') {
       echo "<h2>Sorry. You can't delete anything.</h2>";
     }
   }
-  else if ($type == 'xml') {
+  else if ($action == 'xml') {
     $twistdb = new TwistCRUD;
     $filename = $twistdb->xml();
     echo '<h3>Your XML file here: <a href="' . $filename . '">' . $filename . '</a></h3>';
   }
-  
-  else {
-    if ($twistid > 0) {
-      // there's a valid twist ID
-      echo '<h2>See this nifty twist?</h2>';
-      echo $twistdb->html_display($twistid);
-    } else {
-      // no valid twist ID so show the big list of twists.
-      $twistdb = new TwistCRUD;
-      $twists = $twistdb->load_all_records(array('created'=>'DESC'));
-
-// echo '<pre>'; print_r($twists); echo '</pre>';
-
-      if (count($twists) > 0) {
-        $uids = array();
-        foreach ($twists as $twist) {
-          $uid = $twist['USERID'];
-          $uids[$uid] = $uid;
-        }
-
-        // $uids now contains all the users we'll need.
-        // let's load all the users.
-        
-        $users = array();
-        $userdb = new UserCRUD;
-        foreach ($uids as $uid=>$foo) {
-          $user = $userdb->load_user($uid);
-          if ($user) $users[$user['id']] = $user;
-        }
-        
-        // gather admin and current info
-        $admin = Session::current_user_is_admin();
-        $current_user = $userdb->load_user(Session::current_user());
-
-        echo '<h2>The Big List Of Twists</h2>';
-        echo '<table border="1"><tr>';
-        // header row
-        echo '<th>Twist</th><th>By</th>';
-        // ...and now all the twist rows.
-        foreach($twists as $twist) {
-          $user = ArrayCheck::get($users, $twist['TWISTID'], -1);
-          echo '<tr>';
-          echo '<td><a href="'. Server::php_self('index.php') . '?id=' . $twist['TWISTID'] . '">' .
-            $twist['twist'] . '</a></td><td>' .
-              ArrayCheck::get($user,'user_name','&lt;unknown&gt;') . '</td>';
-          echo '</tr>';
-        }
-        echo '</table>';
-      } else {
-        // no twists to display.
-        echo "<h2>Sorry, there aren't any twists to lists.</h2>";
-        echo '<div>Why not <a href="' . Server::php_self('index.php') . '?type=add">add one</a>?</div>';
-      }
-    }
+  else if ($action == 'view' && $twistid > 0) {
+    // there's a valid twist ID
+    echo '<h2>See this nifty twist?</h2>';
+    echo $twistdb->html_display($twistid);
+  } else {
+    // by default we show all the twists.
+    $twistdb = new TwistCRUD;
+    $table = $twistdb->table_name();
+    $sql = "SELECT * FROM $table";
+    $results = $twistdb->crud_query($sql);
+    $twistdb->html_generic_table($results, TRUE, TRUE);
   }
 //// end of GET
 } else if ($request_method == 'POST') {
   // POST means to add or update this twist record.
-  $type = Post::get('type', '');
+  $action = Post::get('type', '');
+  $twisid = Post::get('id', '-1');
   $twistdb = new TwistCRUD;
-  switch ($type) {
+  switch ($action) {
     case 'delete':
       // delete item
       if (Session::current_user_can_edit()) {
@@ -141,13 +105,14 @@ if ($request_method == 'GET') {
       break;
     case 'add':
     case 'edit':
-      if (Session::current_user_can_edit()) {
-        $userSchema = get_schema('questions');
-        $input = Post::for_keys($userSchema);
-      //  echo '<pre>'; var_dump($input); echo '</pre>';
-        $input = sanitize_input_schema($input, $userSchema);
-        $input['created'] = time();
+      if (TRUE) {//Session::current_user_can_edit()) {
         $twistdb = new TwistCRUD();
+        $userSchema = get_schema($twistdb->table_name());
+        $input = Post::for_keys($userSchema);
+        $input[$twistdb->primary_key()] = $twistid;
+        echo '<pre>'; var_dump($input); echo '</pre>';
+        $input = sanitize_input_schema($input, $userSchema);
+        //$input['created'] = time();
         $added = $twistdb->write_twist($input);
         echo 'Added twist.';
         echo $twistdb->html_display($added);

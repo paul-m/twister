@@ -12,6 +12,15 @@ class CRUDOOP {
   protected $schema; // display/validation data.
   protected $table; // name of table.
   protected $idkey; // unique id for this table.
+  
+  protected $records; // array of records already loaded
+  
+  protected $joins; // array of left joins.
+    // each join is assumed to share its primary key with the previous one
+    // that is, $this should have a foreign key that is the primary key
+    // of the first join element and so on down the joins.
+    // This join system is very braindead and can only give you good results
+    // if the combined tables have unique column names.
 
   function __construct($table = '') {
     $this->set_schema($table);
@@ -21,7 +30,7 @@ class CRUDOOP {
     return $this->idkey;
   }
   
-  function table_name() {
+  public function table_name() {
     return $this->table;
   }
 
@@ -29,6 +38,8 @@ class CRUDOOP {
     $this->table = NULL;
     $this->schema = NULL;
     $this->idkey = '';
+    $this->records = array();
+    $this->joins = array();
     $this->schema = get_schema($table);
     if ($this->schema) $this->table = $table;
     if (isset($this->schema['#UNIQUEID'])) {
@@ -37,6 +48,20 @@ class CRUDOOP {
       $this->idkey = '';
     }
   }
+  
+  function record_count() {
+    // you fairly ask: How many records do we have?
+    return count($this->records);
+  }
+  
+  function record_id($id = NULL) {
+    // do we have the record for this ID in memory?
+    $result = FALSE;
+    if (array_key_exists($id, $this->records))
+      $result = $this->records[$id];
+    return $result;
+  }
+  
 
   function crud_query($sql = '') {
     if ($sql == '') return NULL;
@@ -101,9 +126,9 @@ class CRUDOOP {
    * DATETIME, for a given key within the record.
    */
   function convert_unix_to_datetime_for_key(&$record, $key) {
-    $column = ArrayCheck::get($this->schema, $key, NULL);
+    $column = ArrayCheck::arr_get($this->schema, $key, NULL);
     if (!$column) return;
-    if (ArrayCheck::get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
+    if (ArrayCheck::arr_get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
       // convert the item in the record.
       $timestamp = (int)$record[$key];
       $record[$key] = date("Y-m-d H:i:s", $timestamp);
@@ -115,9 +140,9 @@ class CRUDOOP {
    * timestamp, for a given key within the record.
    */
   function convert_datetime_to_unix_for_key(&$record, $key) {
-    $column = ArrayCheck::get($this->schema, $key, NULL);
+    $column = ArrayCheck::arr_get($this->schema, $key, NULL);
     if (!$column) return;
-    if (ArrayCheck::get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
+    if (ArrayCheck::arr_get($column, 'type', 'NOTDATETIME') == 'DATETIME') {
       // convert the item in the record.
       $datetime = (int)$record[$key];
       $record[$key] = strtotime($datetime);
@@ -130,7 +155,7 @@ class CRUDOOP {
    * SQL queries.
    */
   function sql_value_entick($value, $key) {
-    switch (ArrayCheck::get($this->schema[$key], 'sanitize', 'VARCHAR')) {
+    switch (ArrayCheck::arr_get($this->schema[$key], 'sanitize', 'VARCHAR')) {
 //    switch ($this->schema[$key]['sanitize']) {
       // textual types get ticks
       // PASSWORD is expected to have been hashed.
@@ -146,7 +171,7 @@ class CRUDOOP {
 
   function write_record($record) {
     // if 'id' is given, then it's an update. otherwise, an insert.
-    $affectedid = ArrayCheck::get($record, $this->idkey, -1);
+    $affectedid = ArrayCheck::arr_get($record, $this->idkey, -1);
     $keys = array_intersect_key($record, $this->schema);
     // check if the id key exists. if it's not there, insert.
     if (!array_key_exists($this->idkey, $record)) {
@@ -223,6 +248,28 @@ class CRUDOOP {
     $result = DB::connection()->query($sql);
     if (!$result) echo "Failed to find stuff.";
     $hits = $result->fetch_all();
+  }
+
+  function join($crudoop = NULL) {
+    if (!$crudoop || !($crudoop instanceof CRUDOOP)) {
+      // should throw an error.
+      return FALSE;
+    }
+    $this->joins[] = $crudoop;
+  }
+
+  function join_sql($where = '') {
+    $tables = array();
+    $sql = 'SELECT * FROM ' . $this->table_name() . ' ';
+    $last_table = $this->table_name();
+    foreach($this->joins as $join) {
+      $join_table = $join->table_name();
+      $join_key = $join->primary_key();
+      $sql .= "LEFT JOIN $join_table ON $last_table.$join_key = $join_table.$join_key ";
+      $last_table = $join_table;
+    }
+    if ($where != '') $sql .= " WHERE $where";
+    return $sql;
   }
 
 }

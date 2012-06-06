@@ -41,8 +41,7 @@ if (!$connection) {
   die('This homework was unable to make a connection. Please try again later. Or something.');
   }
 
-$db = 'TwisterDB';
-//$db = 'paulm77';
+$db = 'paulm77';
 
 if (!mysql_select_db($db, $connection)) {
   // Better error handling here in actual app.

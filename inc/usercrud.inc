@@ -24,7 +24,7 @@ class UserCRUD extends CRUDDisplay {
    */
   function write_user($record = array()) {
     $primary_key = $this->primary_key();
-    $isinsert = (ArrayCheck::get($record, $primary_key, -1) < 1);
+    $isinsert = (ArrayCheck::arr_get($record, $primary_key, -1) < 1);
     if ($isinsert) {
       $record['created'] = time();
       if (isset($record['password'])) {
@@ -72,7 +72,7 @@ class UserCRUD extends CRUDDisplay {
   /**
    * $result is a mysqli result object
    */
-  function list_users($result = NULL, $allow_view = TRUE, $allow_edit = FALSE) {
+  function list_userszzz($result = NULL, $allow_view = TRUE, $allow_edit = FALSE) {
     if ($result) {
       // set up the column display names
       $columns = $this->table_column_display_info();
@@ -82,7 +82,7 @@ class UserCRUD extends CRUDDisplay {
       if ($showme) {
         // if the query doesn't give us the primary key then
         // we have no way of knowing which record we'd be editing.
-        $has_primary_key = ArrayCheck::get($showme, $this->primary_key(), FALSE);
+        $has_primary_key = ArrayCheck::arr_get($showme, $this->primary_key(), FALSE);
         $table_name = $this->table_name();
         echo "<h2>$table_name</h2>\n";
         // start table
@@ -134,6 +134,11 @@ class UserCRUD extends CRUDDisplay {
   function view_link($id, $text) {
     return '<div><a href="' . Server::php_self('user.php') .
       '?id=' . $id . '">' . $text . '</a></div>';
+  }
+  
+  function search($searchterm) {
+    // find $searchterm in name and/or email
+    return parent::search($searchterm, array('name', 'email'));
   }
 
 }

@@ -11,17 +11,19 @@
  * and let the class deal with the mechanics.
  */
 class DB {
-  private static $mysqli = NULL; // mysqli object
+  public static $mysqli = NULL; // mysqli object
 
   /**
    * Set up the connection by creating a mysqli object.
    */
+  // should actually be private
   public static function start_connect($db = NULL) {
     if (!$db) $db = get_db(); // get_db() should be a static property of this class.
     self::$mysqli = new mysqli($db['host'], $db['user'], $db['password'], $db['database'], $db['port']);
     if (self::$mysqli->connect_errno) {
       self::$mysqli = NULL;
       // this should be an exception.
+//      throw new Exception('Failed to connect to MySQL: ' . self::$mysqli->connect_error);
       echo "Failed to connect to MySQL: " . self::$mysqli->connect_error;
     }
   }
@@ -52,7 +54,6 @@ function db_shutdown() {
 
 register_shutdown_function('db_shutdown');
 
-
 /**
  * get_db function.
  * 
@@ -73,11 +74,11 @@ register_shutdown_function('db_shutdown');
 
 function get_db() {
   return array(
-    'database'=> 'TwisterDB',
+    'database'=> 'paulm77',
     'user' => 'root',
     'password' => 'root',
-    'host' => "localhost",
-    'port' => "8889",
+    'host' => 'localhost',
+    'port' => '8889',
   );
 }
 

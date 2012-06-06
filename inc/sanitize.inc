@@ -8,7 +8,7 @@ function sanitize_input_schema($input = array(), $schema = array()) {
   $result = array();
   $keys = array_intersect_key($input, $schema);
   foreach($keys as $key=>$value) {
-    $type = ArrayCheck::get($schema, 'sanitize', 'VARCHAR');
+    $type = ArrayCheck::arr_get($schema, 'sanitize', 'VARCHAR');
     $funcName = 'sanitize_' . $type;
     if (function_exists($funcName)) {
       $result[$key] = $funcName($input[$key]);

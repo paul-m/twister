@@ -15,11 +15,11 @@ class CRUDDisplay extends CRUDOOP {
       $schema = $this->schema;
       foreach($schema as $db_col=>$info) {
         if ($db_col != '#UNIQUEID') {
-          $display_info = ArrayCheck::get($info, 'form', NULL);
+          $display_info = ArrayCheck::arr_get($info, 'form', NULL);
           if ($display_info) {
-            $display = ArrayCheck::get($display_info, 'display', '');
+            $display = ArrayCheck::arr_get($display_info, 'display', '');
             if ($display != 'hidden') {
-              $label = ArrayCheck::get($display_info, 'label', $db_col);
+              $label = ArrayCheck::arr_get($display_info, 'label', $db_col);
               $text = $record[$db_col];
               if ($display == 'password')
                 $text = '*****';
@@ -32,7 +32,6 @@ class CRUDDisplay extends CRUDOOP {
       if (count($table) < 1)
         return "<div><h3>Unable to display record id: $id.</h3></div>";
 
-      // now we have $table which is full of lovely info.
       // let's make a chart.
       $html = '<table border="0">';
       foreach($table as $foo=>$row) {
@@ -46,7 +45,7 @@ class CRUDDisplay extends CRUDOOP {
 
 //      print_r($table);
     } else {
-    return "<div><h3>Unable to load user for display. id: $id.</h3></div>";
+    return "<div><h3>Unable to load record for display. id: $id.</h3></div>";
     }
   }
 
@@ -63,17 +62,17 @@ class CRUDDisplay extends CRUDOOP {
     $schema = $this->schema;
     $html = '';
     foreach($schema as $db_col=>$info) {
-      $display_info = ArrayCheck::get($info, 'form', NULL);
+      $display_info = ArrayCheck::arr_get($info, 'form', NULL);
       // we don't want to show #uniqueid.
       // there's probably a better way to structure this.
       if ($display_info && (!($db_col == '#UNIQUEID'))) {
         if ($display_info['type'] != 'hidden') {
           $html .= '<label for="' . $db_col . '">' .
-          ArrayCheck::get($display_info, 'label', $db_col) . "</label>\n";
+          ArrayCheck::arr_get($display_info, 'label', $db_col) . "</label>\n";
         }
         $html .= '<input type="' . $display_info['type'] .
           '" name="' . $db_col . 
-          '" value="' . ArrayCheck::get($record, $db_col, '') . '" /><br>' . "\n";
+          '" value="' . ArrayCheck::arr_get($record, $db_col, '') . '" /><br>' . "\n";
       }
     }
     return $html;
@@ -160,15 +159,16 @@ class CRUDDisplay extends CRUDOOP {
   /**
    * $result is a mysqli result object
    */
-  function html_generic_table($result = NULL) {
+  function html_generic_table($result = NULL, $allow_view = FALSE, $allow_edit = FALSE) {
     if ($result) {
       // set up the column display names
       $columns = $this->table_column_display_info();
-  
       // start showing data
       $showme = $result->fetch_assoc();
+      $has_primary_key = ArrayCheck::arr_get($showme, $this->primary_key(), FALSE);
       if ($showme) {
-        echo "<h2>$this->name()</h2>\n";
+        $name = $this->table_name();
+        echo "<h2>$name</h2>\n";
         // start table
         echo '<table cellpadding="3" cellspacing="0" border="1">';
         // show DB column names as table headers
@@ -176,6 +176,7 @@ class CRUDDisplay extends CRUDOOP {
         foreach ($columns as $column=>$display) {
           echo "<th>$display</th>";
         }
+        if (($allow_edit || $allow_view) && $has_primary_key) echo '<th></th>';
         echo "</tr>\n";
         // now start showing row data
         $rownum = 0;
@@ -187,6 +188,14 @@ class CRUDDisplay extends CRUDOOP {
             if ($data == 'NULL') $data = 'N/A';
             echo "<td>$data</td>\n";
           }
+          if ($has_primary_key && ($allow_edit || $allow_view)) {
+            $operations = '<div>';
+            if ($allow_view)
+              $operations .= $this->view_link($showme[$this->primary_key()], 'view');
+            if ($allow_edit)
+              $operations .= ' ' . $this->edit_link($showme[$this->primary_key()], 'edit');
+            echo "<td>$operations</td>";
+          }
           echo '</tr>';
         } while ($showme = $result->fetch_assoc());
       }
@@ -194,7 +203,58 @@ class CRUDDisplay extends CRUDOOP {
     }
     echo '<div style="error">No results for this query.</div>';
   }
-  
+
+  /**
+   * $result is a mysqli result object
+   * this function differes from html_generic_table by showing the raw
+   * column names.
+   */
+  function html_result_table($result = NULL, $allow_view = FALSE, $allow_edit = FALSE) {
+    if ($result) {
+      // start showing data
+      $showme = $result->fetch_assoc();
+      if ($showme) {
+        $has_primary_key = ArrayCheck::arr_get($showme, $this->primary_key(), FALSE);
+        $columns = array_keys($showme);
+        $name = $this->table_name();
+        echo "<h2>$name</h2>\n";
+        // start table
+        echo '<table cellpadding="3" cellspacing="0" border="1">';
+        // show DB column names as table headers
+        echo "<tr>\n";
+        foreach ($columns as $column) {
+          echo "<th>$column</th>";
+        }
+        if (($allow_edit || $allow_view) && $has_primary_key) echo '<th></th>';
+        echo "</tr>\n";
+        // now start showing row data
+        $rownum = 0;
+        do {
+          if (++$rownum & 1) echo '<tr class="odd">';
+          else echo '<tr class="even">';
+          foreach ($columns as $column) {
+            $data = $showme[$column];
+            if ($data == 'NULL') $data = 'N/A';
+            echo "<td>$data</td>\n";
+          }
+          if ($has_primary_key && ($allow_edit || $allow_view)) {
+            $operations = '<div>';
+            if ($allow_view)
+              $operations .= $this->view_link($showme[$this->primary_key()], 'view');
+            if ($allow_edit)
+              $operations .= ' ' . $this->edit_link($showme[$this->primary_key()], 'edit');
+            echo "<td>$operations</td>";
+          }
+          echo '</tr>';
+        } while ($showme = $result->fetch_assoc());
+      }
+      return;
+    }
+    echo '<div style="error">No results for this query.</div>';
+  }
+
+
+
   /**
    * Hands us an array with the display info for
    * all the columns. Useful for building tables.
@@ -205,11 +265,11 @@ class CRUDDisplay extends CRUDOOP {
     $schema = $this->schema;
     foreach($schema as $db_col=>$info) {
       if ($db_col != '#UNIQUEID') {
-        $display_info = ArrayCheck::get($info, 'form', NULL);
+        $display_info = ArrayCheck::arr_get($info, 'form', NULL);
         if ($display_info) {
-          $display = ArrayCheck::get($display_info, 'display', '');
+          $display = ArrayCheck::arr_get($display_info, 'display', '');
           if ($display != 'hidden') {
-            $label = ArrayCheck::get($display_info, 'label', $db_col);
+            $label = ArrayCheck::arr_get($display_info, 'label', $db_col);
             $columns[$db_col] = $label;
           }
         }
@@ -217,6 +277,23 @@ class CRUDDisplay extends CRUDOOP {
     }
     return $columns;
   }
+
+  /**
+   * Returns the text of a link to edit a given user, by id.
+   */
+  function edit_link($id, $text) {
+    return '<div><a href="' . Server::php_self('user.php') .
+      '?action=edit&id=' . $id . '">' . $text . '</a></div>';
+  }
+
+  /**
+   * Returns the text of a link to view a user, by id.
+   */
+  function view_link($id, $text) {
+    return '<div><a href="' . Server::php_self('user.php') .
+      '?action=view&id=' . $id . '">' . $text . '</a></div>';
+  }
+
 }
 
 

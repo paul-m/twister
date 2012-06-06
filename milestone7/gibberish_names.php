@@ -12,7 +12,7 @@
 
 $connection = FALSE;
 
-//$connection = mysql_connect("ovid.u.washington.edu:5611", "paulm77", "");
+//$connection = mysql_connect("ovid.u.washington.edu:5611", "paulm77", "hYN5ZYlp");
 
 $connection = mysql_connect("localhost:8889", "root", "root");
 
@@ -21,8 +21,7 @@ if (!$connection) {
   die('This homework was unable to make a connection. Please try again later. Or something.');
   }
 
-//if (!mysql_select_db("paulm77", $connection)) {
-if (!mysql_select_db("TwisterDB", $connection)) {
+if (!mysql_select_db("paulm77", $connection)) {
   // Better error handling here in actual app.
   die('This homework was unable to use a database. Please try again later. Or something.');
   }

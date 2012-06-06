@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `Twists` (
 CREATE TABLE IF NOT EXISTS `Ratings` (
   `RATINGID` int(11) UNSIGNED NOT NULL auto_increment,
   `TWISTID` int(11) UNSIGNED NOT NULL,
-  `voter_USERID` int(11) UNSIGNED NOT NULL,
+  `USERID` int(11) UNSIGNED NOT NULL,
   `points` int(11),
   `need_update` BOOLEAN default FALSE,
   PRIMARY KEY (`RATINGID`)

@@ -2,9 +2,10 @@
 <head>
 <META HTTP-EQUIV="Expires" CONTENT="-1">
 <LINK href="site/common.css" rel="stylesheet" type="text/css">
+<!-- LINK href="site/more.css" rel="stylesheet" type="text/css" -->
 <title>Twister</title></head>
 <body>
-<div id="centeredmenu">
+<nav id="centeredmenu">
    <ul>
       <li><a href="index.php">Twists</a></li>
       <li><a href="index.php?type=add">Add a Twist</a></li>
@@ -14,7 +15,7 @@
       <li><a href="login.php?type=logout">Logout</a></li>
       <li><a href="index.php?type=xml">XML</a></li>
    </ul>
-</div>
+</nav>
 <div id="wrapper">
 <div id="content">
 <div id="item">

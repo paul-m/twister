@@ -25,7 +25,7 @@ if ($request_method == 'GET') {
   $userid = Get::get_get('id', '-1');
   if ($action == 'edit') {
     echo '<h2>Edit this user</h2>';
-    echo '<form name="input" action="' . Server::php_self('index.php') .
+    echo '<form name="input" action="' . Server::php_self('user.php') .
       '" method="post">';
     echo '<input type="hidden" id="input" name="action" value="edit" />';
     echo $userdb->html_form($userid);
@@ -69,7 +69,9 @@ if ($request_method == 'GET') {
       // no user ID so show the big list of users.
       $userdb = new UserCRUD;
       $table = $userdb->table_name();
-      $userdb->list_users($userdb->crud_query("SELECT * FROM $table"), TRUE, TRUE);
+      $sql = "SELECT * FROM $table";
+      $results = $userdb->crud_query($sql);
+      $userdb->html_generic_table($results, TRUE, TRUE);
     }
   }
 //// end of GET

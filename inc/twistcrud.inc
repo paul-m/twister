@@ -22,7 +22,7 @@ class TwistCRUD extends CRUDDisplay {
 
   function write_twist($record = array()) {
     // check for insert condition... id doesn't exist or is -1
-    if (ArrayCheck::get($record, 'TWISTID', -1) < 1) {
+    if (ArrayCheck::arr_get($record, 'TWISTID', -1) < 1) {
       $record['created'] = time();
       unset($record['id']);
     }
@@ -52,32 +52,12 @@ class TwistCRUD extends CRUDDisplay {
   // return HTML as a nice display of the data.
   function html_display($id = -1) {
     if ($id > 0) {
-      $record = $this->load_twist($id);
-      if ($record) {
-        $userdb = new UserCRUD;
-        $user = $userdb->load_user($record['USERID']);
-        
-        $html = '<div id="twist">' . $record['question'] . '</div>';
-        $html .= '<div>Written by: ' .
-          ArrayCheck::get($user,'user_name','&lt;unknown&gt;') .
-          ' on ' . date(DATE_RFC850, $record['created']);
-        
-        $current_user = Session::current_user();
-        $admin = Session::current_user_is_admin();
-        
-        if ($admin || ($current_user == $user['id'])) {
-          $html .= ' <a href="' . Server::php_self() .
-          '?type=edit&id=' . $id . '">edit</a>';
-          $html .= ' <a href="' . Server::php_self() .
-          '?type=delete&id=' . $id . '">delete</a>';
-        }
-        $html .= ' <a href="' . Server::php_self() .
-        '?id=' . $id . '">permalink</a>';
-        $html .= '</div>';
-        return $html;
-      }
+      $sql = "select t.*, u.`user_name` from Twists as t left join Users as u on t.`USERID` = u.`USERID` where t.TWISTID = $id";
+      $result = $this->crud_query($sql);
+      $this->html_result_table($result, FALSE, TRUE);
+      return;
     }
-  return "<div><h3>Unable to load twist. id: $id.</h3></div>";
+    return "<div><h3>Unable to load twist. id: $id.</h3></div>";
   }
 
   // return HTML as a form for entering the data.
@@ -90,9 +70,9 @@ class TwistCRUD extends CRUDDisplay {
     }
     $html = '<label for="question">Twist:</label>';
     $html .= '<input type="text" name="question" value="' .
-      ArrayCheck::get($record, 'question', '') . '" /><br>'."\n";
+      ArrayCheck::arr_get($record, 'question', '') . '" /><br>'."\n";
     $html .= '<input type="hidden" name="id" value="' .
-      ArrayCheck::get($record, 'id', -1) . '" /><br>'."\n";
+      ArrayCheck::arr_get($record, 'id', -1) . '" /><br>'."\n";
     $html .= '<input type="hidden" name="USERID" value="' .
       Session::current_user() . '" /><br>'."\n";
     return $html;
