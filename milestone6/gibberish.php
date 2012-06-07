@@ -12,9 +12,9 @@
 
 $connection = FALSE;
 
-//$connection = mysql_connect("ovid.u.washington.edu:5611", "paulm77", "");
+$connection = mysql_connect("ovid.u.washington.edu:5611", "paulm77", "hYN5ZYlp");
 
-$connection = mysql_connect("localhost:8889", "root", "root");
+//$connection = mysql_connect("localhost:8889", "root", "root");
 
 if (!$connection) {
   // Better error handling here in actual app.
