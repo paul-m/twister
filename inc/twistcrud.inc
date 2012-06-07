@@ -62,16 +62,16 @@ class TwistCRUD extends CRUDDisplay {
   // return HTML as a form for entering the data.
   // caller must supply their own <form> tag and submit button.
   function html_form($id = -1) {
+    $primary_key = $this->primary_key();
     if ($id > 0) {
       $record = $this->load_record($id);
     } else {
-      $record = array($this->primary_key() => -1);
+      $record = array($primary_key => -1);
     }
     $current_user = Session::current_user();
     if ($current_user > 0) $record['USERID'] = $current_user;
-    $schema = $this->schema;
-    $primary_key = $this->primary_key();
     $html = '';
+    $schema = $this->schema;
     foreach($schema as $db_col=>$info) {
       $display_info = ArrayCheck::arr_get($info, 'form', NULL);
       // we don't want to show #uniqueid.

@@ -42,13 +42,12 @@ if ($request_method == 'GET') {
   else if ($action == 'add') {
     $current_user = Session::current_user();
     if ($current_user > 0) {
-//      $userdb = new UserCRUD;
       echo '<h2>Add a twist</h2>'."\n";
-      echo '<form name="twist_add" action="' . Server::php_self('index.php') . '" method="post">'."\n";
+      echo '<form name="twist_add" id="twist_add" action="' . Server::php_self('index.php') . '" method="post">'."\n";
       echo '<input type="hidden" name="action" value="add" />'."\n";
-//      echo '<input type="hidden" name="' . $userdb->primary_key() . '" value="' . $current_user . '" />'."\n";
       echo $twistdb->html_form();
-      echo '<input type="submit" value="Submit" />';
+      echo '<input type="submit" value="Submit" id="id_Twists_submit" />';
+      echo '<div id="id_twist_count"></div>';
     } else {
       echo "<h2>You can't add a twist yet.</h2>";
       echo '<div>Why not <a href="register.php">register</a> or <a href="login.php">log in</a>?</div>';

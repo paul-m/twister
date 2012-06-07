@@ -3,6 +3,8 @@
 <META HTTP-EQUIV="Expires" CONTENT="-1">
 <LINK href="site/common.css" rel="stylesheet" type="text/css">
 <!-- LINK href="site/more.css" rel="stylesheet" type="text/css" -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script> 
+<script type="text/javascript" src="site/twister.js"></script>
 <title>Twister</title></head>
 <body>
 <nav id="centeredmenu">

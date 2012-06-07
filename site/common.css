@@ -86,6 +86,7 @@ background-color: #fef7eb;
 
 .twist {
 	font-size: 1.5em;
+	text-align: left;
 }
 
 .class_Twists_twist {
@@ -94,4 +95,5 @@ background-color: #fef7eb;
 
 .twist_info {
   font-size: .75em;
+  text-align: right;
 }
