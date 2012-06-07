@@ -170,11 +170,12 @@ class CRUDOOP {
   }
 
   function write_record($record) {
+    $primary_key = $this->primary_key();
     // if 'id' is given, then it's an update. otherwise, an insert.
-    $affectedid = ArrayCheck::arr_get($record, $this->idkey, -1);
+    $affectedid = ArrayCheck::arr_get($record, $primary_key, -1);
     $keys = array_intersect_key($record, $this->schema);
     // check if the id key exists. if it's not there, insert.
-    if (!array_key_exists($this->idkey, $record)) {
+    if (!array_key_exists($primary_key, $record)) {
       // prepare an insert.
       $into = array();
       $values = array();
@@ -182,7 +183,7 @@ class CRUDOOP {
         $into[] = $key;
         $values[] = $this->sql_value_entick($record[$key], $key);
       }
-      $queryString = 'INSERT INTO ' . $this->table . ' (' .
+      $queryString = 'INSERT INTO ' . $this->table_name() . ' (' .
         implode(", ", $into) .
         ") VALUES (" .
         implode(", ", $values) . ")";
@@ -194,7 +195,7 @@ class CRUDOOP {
       }
       // remove the id from the SET part of the query
       unset($set[$this->idkey]);
-      $queryString = 'UPDATE ' . $this->table . ' SET ' .
+      $queryString = 'UPDATE ' . $this->table_name() . ' SET ' .
         implode(", ", $set) .
         " WHERE " . $this->idkey . " = " . $record[$this->idkey];
     }
@@ -208,8 +209,8 @@ class CRUDOOP {
 
   function delete_record($id) {
     // for schema, delete record where key = id.
-    $query = DB::connection()->query("DELETE FROM " . $this->table .
-      ' WHERE ' . $this->idkey . ' = ' . $id);
+    $query = $this->crud_query("DELETE FROM " . $this->table_name() .
+      ' WHERE ' . $this->primary_key() . ' = ' . $id);
     if (!$query) {
       echo "Failed to delete id $id from MySQL.";
     }

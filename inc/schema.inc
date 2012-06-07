@@ -143,7 +143,7 @@ function get_schema($table) {
           'display' => 'hidden',
         ),
       ),
-      'reply_to_USERID' => array(
+      'reply_to_TWISTID' => array(
         'type' => 'INT',
         'sanitize' => 'INT',
         'form' => array (
@@ -186,7 +186,7 @@ function get_schema($table) {
         ),
       ),
 
-      'points_total' => array(
+/*      'points_total' => array(
         'type' => 'INT',
         'sanitize' => 'INT',
         'form' => array (
@@ -194,7 +194,7 @@ function get_schema($table) {
           'display' => 'hidden',
           'label'=> 'Points',
         ),
-      ),
+      ),*/
 
     ),
 

@@ -30,6 +30,7 @@ if ($request_method == 'GET') {
     echo '<form name="input" action="' . Server::php_self('register.php') . '" method="post">';
     echo '<fieldset><legend>Register:</legend>';
     echo $user->html_form(-1);
+    echo '<input type="hidden" name="action" value="add">' . "\n";
     echo '<input type="submit" value="Submit" />';
     echo '</fieldset>';
   }

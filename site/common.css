@@ -76,9 +76,17 @@ background-color: #fef7eb;
    background:#000;
    font-weight:bold;
 }
-#twist {
+
+.twist_frame {
+  border-style: groove;
+  background-color: white;
+  padding: 20;
+}
+
+.twist {
 	font-size: 3em;
 }
-#byline {
-	text-align: right;
+
+.twist_info {
+  font-size: .75em;
 }

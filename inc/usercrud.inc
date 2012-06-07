@@ -41,7 +41,7 @@ class UserCRUD extends CRUDDisplay {
     $this->convert_unix_to_datetime_for_key($record, 'modified');
     $this->convert_unix_to_datetime_for_key($record, 'created');
     // add user type
-    ArrayCheck::set_if_not_set($record, 'type', 'user');
+    ArrayCheck::set_if_not_set($record, 'role', 'user');
     return parent::write_record($record);
   }
 

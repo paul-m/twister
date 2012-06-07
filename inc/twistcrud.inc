@@ -22,11 +22,16 @@ class TwistCRUD extends CRUDDisplay {
 
   function write_twist($record = array()) {
     // check for insert condition... id doesn't exist or is -1
-    if (ArrayCheck::arr_get($record, 'TWISTID', -1) < 1) {
+    $primary_key = $this->primary_key();
+    $id = ArrayCheck::arr_get($record, 'id', -1);
+    $id = ArrayCheck::arr_get($record, $primary_key, $id);
+    if ($id < 1) {
       $record['created'] = time();
+      unset($record[$primary_key]);
       unset($record['id']);
     }
-    ArrayCheck::set_if_not_set($record, 'USERID', -1);
+    ArrayCheck::set_if_not_set($record, 'USERID', 0);
+    ArrayCheck::set_if_not_set($record, 'reply_to_TWISTID', 0);
     $time = time();
     if (!isset($record['created']) ||
       $record['created'] == '')
@@ -34,6 +39,7 @@ class TwistCRUD extends CRUDDisplay {
     $record['modified'] = $time;
     $this->convert_unix_to_datetime_for_key($record, 'modified');
     $this->convert_unix_to_datetime_for_key($record, 'created');
+    //echo '<pre>'; var_dump($record); echo '</pre>';
     return parent::write_record($record);
   }
 
@@ -63,6 +69,61 @@ class TwistCRUD extends CRUDDisplay {
     }
     return "<div><h3>Unable to load twist. id: $id.</h3></div>";
   }
+
+  // return HTML as a nice display of the data.
+  function show_twist_html($id = -1, $allow_edit = FALSE, $allow_delete = FALSE) {
+    if ($id > 0) {
+      $sql = "select t.`USERID`, t.`twist`, t.`modified`, u.`user_name` from Twists as t left join Users as u on t.`USERID` = u.`USERID` where t.TWISTID = $id LIMIT 1";
+      $twist_result = $this->crud_query($sql);
+      if ($twist_result) {
+        $twist = $twist_result->fetch_assoc();
+        
+        echo '<div class="twist_frame"><div class="twist">' . $twist['twist'] . '</div>';
+        echo '<div class="twist_info">Posted on: ' . $twist['modified'] . ' by ';
+        echo '<a href="user.php?action=view&id=' . $twist['USERID'] . '">';
+        echo $twist['user_name'] . '</a>';
+        if ($allow_edit) echo ' <a href="index.php?action=edit&id=' . $id . '">edit</a>';
+        if ($allow_delete) echo ' <a href="index.php?action=delete&id=' . $id . '">delete</a>';
+  
+        echo '</div></div>';
+  /*      
+        $twist_result->data_seek(0);
+  
+        $ratingdb = new CRUDDisplay('Ratings');
+        $tid = $twist['TWISTID'];
+        echo "tid: $tid ";
+        $sql = "SELECT * FROM Ratings WHERE TWISTID = $tid";
+        echo $sql;
+        $rating_result = $ratingdb->crud_query($sql);
+        $ratingdb->html_result_table($rating_result, TRUE, TRUE);
+  
+        $this->html_result_table($twist_result, FALSE, TRUE);*/
+        return;
+      }
+    }
+    return "<div><h3>Unable to load twist. id: $id.</h3></div>";
+  }
+  
+  function show_twists_html($ids = array(), $allow_edit = FALSE, $allow_delete = FALSE) {
+    if (count($ids) < 1) {
+      $ids = array();
+      $sql = "SELECT TWISTID from Twists LIMIT 30";
+      $result = $this->crud_query($sql);
+      while($record = $result->fetch_assoc()) $ids[] = $record['TWISTID'];
+    }
+    if (count($ids) < 1) {
+      echo '<div class="twist_outer_frame"><div class="twist">There are no twists to see.</div></div>';
+    }
+    else {
+      echo '<div class="twist_outer_frame">';
+      foreach ($ids as $id) {
+        $this->show_twist_html($id, TRUE, TRUE);
+      }
+      echo '</div>';
+    }
+  }
+
+
 
   // return HTML as a form for entering the data.
   // caller must supply their own <form> tag and submit button.

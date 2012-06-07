@@ -53,13 +53,14 @@ class CRUDDisplay extends CRUDOOP {
   // return HTML as a form for entering the data.
   // caller must supply their own <form> tag and submit button.
   function html_form($id = -1) {
+  //echo "<br>id = $id<br>";
     if ($id > 0) {
       $record = $this->load_record($id);
     } else {
-      $record = array($this->idkey => $id);
+      $record = array($this->primary_key() => -1);
     }
-    $table = array();
     $schema = $this->schema;
+    $primary_key = $this->primary_key();
     $html = '';
     foreach($schema as $db_col=>$info) {
       $display_info = ArrayCheck::arr_get($info, 'form', NULL);
@@ -70,8 +71,11 @@ class CRUDDisplay extends CRUDOOP {
           $html .= '<label for="' . $db_col . '">' .
           ArrayCheck::arr_get($display_info, 'label', $db_col) . "</label>\n";
         }
+        $form_name = $db_col;
+        if ($db_col == $primary_key) $form_name = 'id';
+
         $html .= '<input type="' . $display_info['type'] .
-          '" name="' . $db_col . 
+          '" name="' . $form_name . 
           '" value="' . ArrayCheck::arr_get($record, $db_col, '') . '" /><br>' . "\n";
       }
     }
@@ -310,7 +314,10 @@ class CRUDDisplay extends CRUDOOP {
     $table = $this->table_name();
     $sql = "SELECT * FROM $table";
     $results = $this->crud_query($sql);
-    $this->html_generic_table($results, $allow_view, $allow_edit);
+    if ($results->num_rows > 0)
+      $this->html_generic_table($results, $allow_view, $allow_edit);
+    else
+      echo '<div>No results.</div>';
   }
 
 }
