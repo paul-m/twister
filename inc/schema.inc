@@ -157,7 +157,7 @@ function get_schema($table) {
         'sanitize' => 'VARCHAR',
         'form' => array (
           'type' => 'text',
-          'label' => 'Twist',
+          'label' => '',
         ),
       ),
  /*     'desc' => array(

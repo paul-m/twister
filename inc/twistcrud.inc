@@ -83,10 +83,14 @@ class TwistCRUD extends CRUDDisplay {
         }
         $form_name = $db_col;
         if ($db_col == $primary_key) $form_name = 'id';
+        $namey_stuff = $this->table_name() . '_' . $db_col;
 
         $html .= '<input type="' . $display_info['type'] .
           '" name="' . $form_name . 
-          '" value="' . ArrayCheck::arr_get($record, $db_col, '') . '" />' . "\n";
+          '" value="' . ArrayCheck::arr_get($record, $db_col, '') . 
+          '" class="class_' . $namey_stuff . 
+          '" id="id_' . $namey_stuff .
+          '" />' . "\n";
       }
     }
     return $html;

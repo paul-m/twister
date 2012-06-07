@@ -117,7 +117,7 @@ if ($request_method == 'GET') {
     case 'search':
       $term = Post::get('searchterm', '');
       //echo '<br>you searched for: ' . $term;
-      $hits = $twistdb->search($term, array('twist'));
+      $hits = $twistdb->search($term, array('twist'), 'modified', 10);
       if (count($hits) > 0)
         $twistdb->show_twists_html($hits, TRUE, TRUE);
       else 
