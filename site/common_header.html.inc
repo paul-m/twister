@@ -11,9 +11,19 @@
       <li><a href="index.php?action=add">Add a Twist</a></li>
       <li><a href="user.php">Users</a></li>
       <li><a href="register.php">Register</a></li>
-      <li><a href="login.php">Login</a></li>
-      <li><a href="login.php?action=logout">Logout</a></li>
-      <li><a href="index.php?action=xml">XML</a></li>
+
+<?php // let's find out if we're logged in.
+require_once('inc/superglobals.inc');
+if (Session::current_user() < 1) echo '<li><a href="login.php">Login</a></li>';
+else echo '<li><a href="login.php?action=logout">Logout</a></li>';
+?>
+      <li>
+  <form class="searchform" action="index.php" method="post">
+  <input type="hidden" name="action" value="search">
+	<input class="searchfield" type="text" name="searchterm" value="Search..." onfocus="if (this.value == 'Search...') {this.value = '';}" onblur="if (this.value == '') {this.value = 'Search...';}" />
+	<input class="searchbutton" type="submit" value="Go" />
+  </form>
+      </li>
    </ul>
 </nav>
 <div id="wrapper">

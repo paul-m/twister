@@ -59,6 +59,39 @@ class TwistCRUD extends CRUDDisplay {
     }
   }
 
+  // return HTML as a form for entering the data.
+  // caller must supply their own <form> tag and submit button.
+  function html_form($id = -1) {
+    if ($id > 0) {
+      $record = $this->load_record($id);
+    } else {
+      $record = array($this->primary_key() => -1);
+    }
+    $current_user = Session::current_user();
+    if ($current_user > 0) $record['USERID'] = $current_user;
+    $schema = $this->schema;
+    $primary_key = $this->primary_key();
+    $html = '';
+    foreach($schema as $db_col=>$info) {
+      $display_info = ArrayCheck::arr_get($info, 'form', NULL);
+      // we don't want to show #uniqueid.
+      // there's probably a better way to structure this.
+      if ($display_info && (!($db_col == '#UNIQUEID'))) {
+        if ($display_info['type'] != 'hidden') {
+          $html .= '<label for="' . $db_col . '">' .
+          ArrayCheck::arr_get($display_info, 'label', $db_col) . "</label>\n";
+        }
+        $form_name = $db_col;
+        if ($db_col == $primary_key) $form_name = 'id';
+
+        $html .= '<input type="' . $display_info['type'] .
+          '" name="' . $form_name . 
+          '" value="' . ArrayCheck::arr_get($record, $db_col, '') . '" />' . "\n";
+      }
+    }
+    return $html;
+  }
+
   // return HTML as a nice display of the data.
   function html_display($id = -1) {
     if ($id > 0) {
@@ -107,12 +140,13 @@ class TwistCRUD extends CRUDDisplay {
   function show_twists_html($ids = array(), $allow_edit = FALSE, $allow_delete = FALSE) {
     if (count($ids) < 1) {
       $ids = array();
-      $sql = "SELECT TWISTID from Twists LIMIT 30";
+      $sql = "SELECT TWISTID from Twists ORDER BY modified DESC LIMIT 20";
       $result = $this->crud_query($sql);
       while($record = $result->fetch_assoc()) $ids[] = $record['TWISTID'];
     }
     if (count($ids) < 1) {
       echo '<div class="twist_outer_frame"><div class="twist">There are no twists to see.</div></div>';
+      return;
     }
     else {
       echo '<div class="twist_outer_frame">';

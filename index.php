@@ -40,11 +40,13 @@ if ($request_method == 'GET') {
     }
   }
   else if ($action == 'add') {
-    //$current_user = Session::current_user();
-    if (TRUE) { //$current_user > 0) {
+    $current_user = Session::current_user();
+    if ($current_user > 0) {
+//      $userdb = new UserCRUD;
       echo '<h2>Add a twist</h2>'."\n";
       echo '<form name="twist_add" action="' . Server::php_self('index.php') . '" method="post">'."\n";
       echo '<input type="hidden" name="action" value="add" />'."\n";
+//      echo '<input type="hidden" name="' . $userdb->primary_key() . '" value="' . $current_user . '" />'."\n";
       echo $twistdb->html_form();
       echo '<input type="submit" value="Submit" />';
     } else {
@@ -59,7 +61,7 @@ if ($request_method == 'GET') {
       echo '<input type="hidden" id="twist_edit" name="action" value="delete" />';
       echo '<input type="hidden" id="twist_edit" name="id" value="' . $twistid . '" />';
       echo '<input type="submit" value="Delete" />';
-      echo $twistdb->html_display($twistid);
+      echo $twistdb->show_twist_html($twistid);
     } else {
       echo "<h2>Sorry. You can't delete anything.</h2>";
     }
@@ -91,7 +93,7 @@ if ($request_method == 'GET') {
         $twistdb->delete_twist(sanitize_INT($twistid));
         echo '<h2>Deleted.</h2>';
         $twistdb = new TwistCRUD;
-        $twistdb->table_show_all(TRUE, TRUE);
+        $twistdb->show_twists_html(array(), TRUE, TRUE);
       } else {
         echo "<h2>Sorry. You can't delete anything.</h2>";
       }
@@ -112,8 +114,16 @@ if ($request_method == 'GET') {
         echo "<h2>Sorry. You can't edit anything.</h2>";
       }
       break;
+    case 'search':
+      $term = Post::get('searchterm', '');
+      //echo '<br>you searched for: ' . $term;
+      $hits = $twistdb->search($term, array('twist'));
+      if (count($hits) > 0)
+        $twistdb->show_twists_html($hits, TRUE, TRUE);
+      else 
+        echo '<div class="twist_frame">There were no search results. Try again?</div>';
+      break;
     default:
-      $twistdb = new TwistCRUD;
       $twistdb->show_twists_html(array(), TRUE, TRUE);
   }
 }

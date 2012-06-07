@@ -28,7 +28,7 @@ class Post extends ArrayCheck {
    * Set post variables.
    */
   public static function set($key = '', $value = 1) {
-    if (isset($_POST)) return parent::set($_POST, $key, $value);
+    if (isset($_POST)) return parent::arr_set($_POST, $key, $value);
     return FALSE;
   }
   
@@ -60,7 +60,7 @@ class Get extends ArrayCheck {
    * Set session variables.
    */
   public static function set($key = '', $value = 1) {
-    if (isset($_GET)) return parent::set($_GET, $key, $value);
+    if (isset($_GET)) return parent::arr_set($_GET, $key, $value);
     return FALSE;
   }
   
@@ -93,6 +93,7 @@ class Session extends ArrayCheck {
     return session_id();
   }
   public static function destroy() {
+    self::start();
     if (isset($_SESSION)) $_SESSION = array();
     if (self::$started) session_destroy();
     setcookie('PHPSESSID', '', time()-3600, '/', '', 0);
@@ -117,7 +118,7 @@ class Session extends ArrayCheck {
   public static function set($key = '', $value = 1) {
     self::start();
     if (isset($_SESSION)) {
-      return parent::set($_SESSION, $key, $value);
+      return parent::arr_set($_SESSION, $key, $value);
     }
     return FALSE;
   }
@@ -141,15 +142,26 @@ class Session extends ArrayCheck {
     self::start();
     // we use the name of the db table, so 'users,'
     // rather than 'user.'
-    $user = self::get('users', NULL);
-    if ($user && isset($user['id'])) return $user['id'];
+    $user = self::get('Users', NULL);
+    if ($user) return $user;
     return $default;
+  }
+
+  public static function set_current_user($id = -1) {
+    self::start();
+    if ($id < 1) {
+      self::sess_unset('Users');
+      self::destroy();
+      return;
+    }
+    $foo= self::set('Users', $id);
+    return $foo;
   }
 
   /** 
    * return true if current user is an admin
    */
-  public static function current_user_is_admin() {
+/*  public static function current_user_is_admin() {
     $currid = self::current_user();
     if ($currid > 0) {
       $userdb = new UserCRUD;
@@ -171,35 +183,25 @@ class Session extends ArrayCheck {
       return $can;
     }
     return FALSE;
-  }
+  }*/
   
-  public static function set_current_user($id = -1) {
-    self::start();
-    if ($id < 1) {
-      self::sess_unset('users');
-      return;
-    }
-    $foo= self::set('users', array('id'=>$id));
-    return $foo;
-  }
-  
-  public static function set_message($message = '') {
+/*  public static function set_message($message = '') {
     self::start();
     if ($message) {
       $messages = self::get('messages', array());
       $messages[Server::php_self()][] = $message;
       self::set('messages', $messages);
     }
-  }
+  }*/
 
   /**
    * Display messages sent from previous forms.
    */
-  public static function get_page_messages() {
+/*  public static function get_page_messages() {
     self::start();
     $messages = self::get('messages', array());
     return self::get($messages, Server::php_self(), NULL);
-  }
+  }*/
 }
 
 /**
@@ -220,7 +222,7 @@ class Server extends ArrayCheck {
    * Set session variables.
    */
   public static function set($key = '', $value = 1) {
-    if (isset($_SERVER)) return parent::set($_SERVER, $key, $value);
+    if (isset($_SERVER)) return parent::arr_set($_SERVER, $key, $value);
     return FALSE;
   }
 
@@ -254,7 +256,7 @@ class Cookie extends ArrayCheck {
    * Set session variables.
    */
   public static function set($key = '', $value = 1) {
-    if (isset($_COOKIE)) return parent::set($_COOKIE, $key, $value);
+    if (isset($_COOKIE)) return parent::arr_set($_COOKIE, $key, $value);
     return FALSE;
   }
   

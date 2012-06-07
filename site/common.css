@@ -81,10 +81,11 @@ background-color: #fef7eb;
   border-style: groove;
   background-color: white;
   padding: 20;
+  margin: 5;
 }
 
 .twist {
-	font-size: 3em;
+	font-size: 1.5em;
 }
 
 .twist_info {

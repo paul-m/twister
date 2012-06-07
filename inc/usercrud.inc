@@ -57,7 +57,7 @@ class UserCRUD extends CRUDDisplay {
   
   function load_user_username($username = '') {
     if ($username) {
-      return parent::load_records_for_keyvalue(array('user_name' => $username));
+      return reset(parent::load_records_for_keyvalue(array('user_name' => $username)));
     }
     return NULL;
   }

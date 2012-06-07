@@ -11,11 +11,11 @@ $loginError = FALSE;
 
 if (Server::request_method() == 'GET') {
   // request is either for a login form or to logout.
-  $type = Get::get_get('type', '');
+  $type = Get::get_get('action', '');
   if ($type == 'logout') {
     // User wants to logout.
-//    Session::set_current_user(-1);
-    Session::destroy();
+    Session::set_current_user(-1);
+//    Session::destroy();
     echo "<div>You're logged out.</div>";
     include 'site/loginform.html.inc';
   }
@@ -40,7 +40,7 @@ if (Server::request_method() == 'GET') {
       $usercrud = new UserCRUD;
       $user = $usercrud->load_user_username($username);
       if (User::hash_password($password) == $user['password']) {
-        Session::set_current_user($user['id']);
+        Session::set_current_user($user['USERID']);
         include 'site/logindifferent.html.inc';
         include 'site/loginform.html.inc';
       } else {

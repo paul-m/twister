@@ -74,21 +74,15 @@ class CRUDOOP {
   }
 
   function load_records_for_keyvalue($keyvalue = array()) {
-    if ($this->schema) {
-      $db_connection = DB::connection();
-      if ($db_connection) {
-        // should check to see if key of array exists in schema.
-        $keys = array_keys($keyvalue);
-        $key = $keys[0];
-        $querystring = "SELECT * FROM " . $this->table .
-          " WHERE " . $key . " = " .
-          $this->sql_value_entick($keyvalue[$key], $key);
-//    echo $querystring;
-        $query = $db_connection->query($querystring);
-        if ($query) return $query->fetch_assoc();
-      }
-    }
-    return array();
+    $keys = array_keys($keyvalue);
+    $key = $keys[0];
+    $sql = "SELECT * FROM " . $this->table_name() .
+      " WHERE " . $key . " = " .
+      $this->sql_value_entick($keyvalue[$key], $key);
+    $result = $this->crud_query($sql);
+    $return = array();
+    while ($row = $result->fetch_assoc()) $return[] = $row;
+    return $return;
   }
   
   function load_all_records($orderby = NULL) { //array('id'=>'DESC')) {
@@ -242,22 +236,28 @@ class CRUDOOP {
     $this->join_schema = array();
   }
 
-  function search($query, $columns = array(), $limit = 20) {
+  function search($query, $columns = array(), $sort = 'modified', $limit = 20) {
     // $query is the literal SQL string that goes after WHERE
     // eg %searchterm%
     // $columns is the set of columns to find within.
     // "SELECT DISTINCT key FROM table WHERE column like '%term%'"
     $primary_key = $this->primary_key();
-    $table = $this->table();
+    $table = $this->table_name();
     $sql = "SELECT DISTINCT $primary_key FROM $table WHERE ";
     $like = array();
     foreach ($columns as $column) {
-      $like[] = $column . ' LIKE ' . $query;
+      $like[] = $column . " LIKE '%" . $query . "%'";
     }
-    $sql .= implode(' OR ', $like) . " LIMIT $limit";
-    $result = DB::connection()->query($sql);
-    if (!$result) echo "Failed to find stuff.";
-    $hits = $result->fetch_all();
+    $sql .= implode(' OR ', $like);
+    $sql .= " ORDER BY $sort DESC";
+    $sql .= " LIMIT $limit";
+//    echo '<br>SQL: ' . $sql;
+    $result = $this->crud_query($sql);
+//    if (!$result) echo "Failed to find stuff.";
+    if (!$result) return array();
+    $hits = array();
+    while($hit = $result->fetch_row()) $hits[] = $hit[0];
+    return $hits;
   }
 
   function join_sql($where = '') {
