@@ -29,7 +29,7 @@ if (!mysql_select_db("paulm77", $connection)) {
 function random_twist() {
   global $connection;
   // return SQL for a random Twist entry
-  $userid = rand(1, 666);
+  $userid = rand(1, 20);
   $points = rand(0, 666);
   $reply_to = rand(0, 666);
   $sql = "insert into Twists (USERID, reply_to_TWISTID, twist, points_total) VALUES ($userid, $reply_to, '$userid randomly got $points points', $points)";
