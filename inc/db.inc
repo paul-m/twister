@@ -60,7 +60,7 @@ register_shutdown_function('db_shutdown');
  * @access public
  * @return Array with database credentials.
  */
-/*function get_db() {
+function get_db() {
   return array(
     'database'=> 'paulm77',
     'user' => 'paulm77',
@@ -69,9 +69,9 @@ register_shutdown_function('db_shutdown');
     'port' => "5611",
     'table_prefix' => '',
   );
-}*/
+}
 
-function get_db() {
+/*function get_db() {
   return array(
     'database'=> 'paulm77',
     'user' => 'root',
@@ -79,7 +79,7 @@ function get_db() {
     'host' => 'localhost',
     'port' => '8889',
   );
-}
+}*/
 
 /*
 CREATE TABLE IF NOT EXISTS `users` (
