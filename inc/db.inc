@@ -66,7 +66,7 @@ function get_db() {
     'user' => 'paulm77',
     'password' => 'hYN5ZYlp',
     'host' => "ovid.u.washington.edu",
-    'port' => "2900",
+    'port' => "5611",
     'table_prefix' => '',
   );
 }
