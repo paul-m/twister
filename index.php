@@ -31,10 +31,12 @@ if ($request_method == 'GET') {
   if ($action == 'edit') {
     if (TRUE) {//Session::current_user_can_edit()) {
       echo '<h2>Edit this twist</h2>';
-      echo '<form name="input" action="' . Server::php_self('index.php') . '" method="post">';
+      $twistdb->twist_form($twistid);
+/*      echo '<form name="input" action="' . Server::php_self('index.php') . '" method="post">';
       echo '<input type="hidden" name="action" value="edit" />';
       echo $twistdb->html_form($twistid);
-      echo '<input type="submit" value="Submit" />';
+      echo '<input type="submit" value="Submit" />';*/
+      
     } else {
       echo "<h2>Sorry. You can't edit anything.</h2>";
     }
@@ -43,11 +45,12 @@ if ($request_method == 'GET') {
     $current_user = Session::current_user();
     if ($current_user > 0) {
       echo '<h2>Add a twist</h2>'."\n";
-      echo '<form name="twist_add" id="twist_add" action="' . Server::php_self('index.php') . '" method="post">'."\n";
+      $twistdb->twist_form(-1);
+/*      echo '<form name="twist_add" id="twist_add" action="' . Server::php_self('index.php') . '" method="post">'."\n";
       echo '<input type="hidden" name="action" value="add" />'."\n";
       echo $twistdb->html_form();
       echo '<input type="submit" value="Submit" id="id_Twists_submit" />';
-      echo '<div id="id_twist_count"></div>';
+      echo '<div id="id_twist_count"></div>';*/
     } else {
       echo "<h2>You can't add a twist yet.</h2>";
       echo '<div>Why not <a href="register.php">register</a> or <a href="login.php">log in</a>?</div>';

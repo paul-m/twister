@@ -161,7 +161,7 @@ class Session extends ArrayCheck {
   /** 
    * return true if current user is an admin
    */
-/*  public static function current_user_is_admin() {
+  public static function current_user_is_admin() {
     $currid = self::current_user();
     if ($currid > 0) {
       $userdb = new UserCRUD;
@@ -183,7 +183,7 @@ class Session extends ArrayCheck {
       return $can;
     }
     return FALSE;
-  }*/
+  }
   
 /*  public static function set_message($message = '') {
     self::start();

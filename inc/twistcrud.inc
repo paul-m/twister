@@ -69,7 +69,7 @@ class TwistCRUD extends CRUDDisplay {
       $record = array($primary_key => -1);
     }
     $current_user = Session::current_user();
-    if ($current_user > 0) $record['USERID'] = $current_user;
+    ArrayCheck::set_if_not_set($record, 'USERID', $current_user);
     $html = '';
     $schema = $this->schema;
     foreach($schema as $db_col=>$info) {
@@ -95,6 +95,15 @@ class TwistCRUD extends CRUDDisplay {
     }
     return $html;
   }
+  
+  function twist_form($id = -1) {
+    echo '<form name="twist_add" id="twist_add" action="' . Server::php_self('index.php') . '" method="post">'."\n";
+    echo '<input type="hidden" name="action" value="add" />'."\n";
+    echo $this->html_form($id);
+    echo '<input type="submit" value="Submit" id="id_Twists_submit" />';
+    echo '<div id="id_twist_count"></div>';
+  }
+  
 
   // return HTML as a nice display of the data.
   function html_display($id = -1) {
