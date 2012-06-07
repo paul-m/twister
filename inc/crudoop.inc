@@ -13,23 +13,18 @@ class CRUDOOP {
   protected $table; // name of table.
   protected $idkey; // unique id for this table.
   
-  protected $records; // array of records already loaded
-  
-  protected $joins; // array of left joins.
-    // each join is assumed to share its primary key with the previous one
-    // that is, $this should have a foreign key that is the primary key
-    // of the first join element and so on down the joins.
-    // This join system is very braindead and can only give you good results
-    // if the combined tables have unique column names.
+  // $joins is a list of all schema *names* that are joined
+  // to this table.
+  protected $joins;
 
   function __construct($table = '') {
     $this->set_schema($table);
   }
-  
+
   function primary_key() {
     return $this->idkey;
   }
-  
+
   public function table_name() {
     return $this->table;
   }
@@ -38,14 +33,11 @@ class CRUDOOP {
     $this->table = NULL;
     $this->schema = NULL;
     $this->idkey = '';
-    $this->records = array();
-    $this->joins = array();
+    $this->clear_joins();
     $this->schema = get_schema($table);
     if ($this->schema) $this->table = $table;
     if (isset($this->schema['#UNIQUEID'])) {
       $this->idkey = $this->schema['#UNIQUEID'];
-    } else {
-      $this->idkey = '';
     }
   }
   
@@ -216,22 +208,39 @@ class CRUDOOP {
     }
   }
   
-/*  function load_all_records() {
-    if ($this->db_connection) {
-      $query = $this->db_connection->query("SELECT * FROM " . $table);
-      $i=0;
-      $result = array();
-      while($i++ < $query->num_rows) {
-        $row = $query->fetch_assoc();
-        $result[$row['id']] = $row;
-      }
-      return $result;
-    }
-    return array();
+  
+  /**
+   * CRUDOOP::join_sql()
+   *
+   * Generates the text of a SQL command joining the 
+   */
+
+  function select($columns = NULL) {}
+
+  /**
+   * CRUDOOP::join()
+   *
+   * Join other crudoop objects here.
+   * $anotherCrudOOP should contain a primary key that is
+   * also present in our own schema.
+   * This system will do a left join with all the join()ed objects
+   * in the order they were join()ed.
+   */
+  function join($anotherCrudOOP = NULL) {
+    if (!$anotherCrudOOP) return NULL;
+    if (!is_a(CRUDOOP)) return NULL; // this really should raise an exception
+    // do we have their key as a column?
+    $foreign_key = $anotherCrudOOP->primary_key();
+    if (!isset($this->table[$foreign_key])) return NULL;
+    // it seems the object qualifies, so we add it.
+    $this->joins[] = $anotherCrudOOP;
+    return $this;
   }
-
-*/
-
+  
+  function clear_joins() {
+    $this->joins = array();
+    $this->join_schema = array();
+  }
 
   function search($query, $columns = array(), $limit = 20) {
     // $query is the literal SQL string that goes after WHERE
@@ -251,14 +260,6 @@ class CRUDOOP {
     $hits = $result->fetch_all();
   }
 
-  function join($crudoop = NULL) {
-    if (!$crudoop || !($crudoop instanceof CRUDOOP)) {
-      // should throw an error.
-      return FALSE;
-    }
-    $this->joins[] = $crudoop;
-  }
-
   function join_sql($where = '') {
     $tables = array();
     $sql = 'SELECT * FROM ' . $this->table_name() . ' ';
@@ -272,6 +273,4 @@ class CRUDOOP {
     if ($where != '') $sql .= " WHERE $where";
     return $sql;
   }
-
 }
-
